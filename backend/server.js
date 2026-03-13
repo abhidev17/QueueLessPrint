@@ -1,7 +1,9 @@
-const userRoutes = require("./routes/userRoutes");
+const printRoutes = require("./routes/printRoutes");
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+
+const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 
@@ -11,6 +13,8 @@ app.use(cors());
 mongoose.connect("mongodb://localhost:27017/queuelessprint")
 .then(() => console.log("MongoDB Connected Successfully"))
 .catch(err => console.log(err));
+
+app.use("/api/print", printRoutes);
 
 app.use("/api/users", userRoutes);
 
