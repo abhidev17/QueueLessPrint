@@ -3,7 +3,7 @@ import API from "../api";
 import { FileText, Clock, CheckCircle, AlertCircle, Loader } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 
-function StudentJobs() {
+function StudentJobsNew({ user }) {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -147,4 +147,4 @@ function StudentJobs() {
   );
 }
 
-export default StudentJobs;
+export default StudentJobsNew;

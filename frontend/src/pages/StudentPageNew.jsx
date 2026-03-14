@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import API from "../api";
-import { Upload, Calendar, Copy, FileText, Loader } from "lucide-react";
+import { Upload, Calendar, Copy, FileText, Loader, AlertCircle } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 
-function StudentPage() {
+function StudentPageNew({ user }) {
   const [copies, setCopies] = useState(1);
   const [pageSize, setPageSize] = useState("A4");
   const [color, setColor] = useState(false);
@@ -13,18 +13,44 @@ function StudentPage() {
   const [slots, setSlots] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Check if user is admin
+  const isAdmin = user?.role === "admin";
+
   useEffect(() => {
-    loadSlots();
-  }, [printDate]);
+    if (!isAdmin) {
+      loadSlots();
+    }
+  }, [printDate, isAdmin]);
 
   const loadSlots = async () => {
     try {
       const res = await API.get(`/print/slots?printDate=${printDate}`);
-      setSlots(res.data);
+      if (res.data && Array.isArray(res.data)) {
+        setSlots(res.data);
+      } else {
+        setSlots([]);
+      }
     } catch (err) {
+      console.error("Error loading slots:", err);
+      setSlots([]);
       toast.error("Failed to load available slots");
     }
   };
+
+  // If user is admin, show unauthorized message
+  if (isAdmin) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-8 text-center">
+          <AlertCircle className="mx-auto mb-4 text-yellow-600" size={48} />
+          <h2 className="text-2xl font-bold text-yellow-800 mb-2">Admin Access</h2>
+          <p className="text-yellow-700">
+            This page is for students only. Please use the Admin Panel to manage print jobs.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const submitPrint = async (e) => {
     e.preventDefault();
@@ -52,7 +78,9 @@ function StudentPage() {
       setColor(false);
       loadSlots();
     } catch (err) {
-      toast.error(err.response?.data?.error || "Failed to submit print job");
+      console.error("Print submission error:", err);
+      const errorMsg = err.response?.data?.error || err.response?.data?.message || err.message || "Failed to submit print job";
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -244,4 +272,4 @@ function StudentPage() {
   );
 }
 
-export default StudentPage;
+export default StudentPageNew;

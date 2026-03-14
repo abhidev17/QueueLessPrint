@@ -7,10 +7,14 @@ exports.createPrintJob = async (req, res) => {
     }
 
     const { copies, pageSize, color, printDate, slotTime } = req.body;
-    const userId = req.user.userId; // Get from authenticated user
+    const userId = req.user?.userId; // Get from authenticated user
+
+    if (!userId) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
 
     if (!copies || !pageSize || !printDate || !slotTime) {
-      return res.status(400).json({ error: "Missing required fields" });
+      return res.status(400).json({ error: "Missing required fields: copies, pageSize, printDate, slotTime" });
     }
 
     // Check slot availability

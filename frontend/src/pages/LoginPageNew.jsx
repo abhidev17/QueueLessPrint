@@ -3,7 +3,7 @@ import API from "../api";
 import { Mail, Lock, User, Eye, EyeOff, PrinterIcon } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 
-function LoginPage({ setUser }) {
+function LoginPageNew({ setUser }) {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -27,13 +27,21 @@ function LoginPage({ setUser }) {
       const res = await API.post("/users/login", { email, password });
       const { token, user } = res.data;
       
+      if (!token || !user) {
+        toast.error("Invalid response from server");
+        setLoading(false);
+        return;
+      }
+      
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
       setUser(user);
       
       toast.success("Login successful!");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Login failed");
+      console.error("Login error:", err);
+      const errorMessage = err.response?.data?.message || "Login failed";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -164,6 +172,10 @@ function LoginPage({ setUser }) {
                 >
                   {loading ? "Signing in..." : "Sign In"}
                 </button>
+
+                <p className="text-xs text-gray-500 mt-4 text-center">
+                  🔒 Don't have an account? Switch to the Register tab to create one.
+                </p>
               </form>
             ) : (
               <form onSubmit={handleRegister} className="space-y-4">
@@ -250,9 +262,19 @@ function LoginPage({ setUser }) {
           </div>
 
           <div className="mt-8 bg-white bg-opacity-10 rounded-lg p-4 text-white text-sm">
-            <p className="font-medium mb-2">Demo Credentials:</p>
-            <p>Email: demo@student.com</p>
-            <p>Password: password123</p>
+            <p className="font-medium mb-3">📋 Demo Credentials:</p>
+            <div className="space-y-2">
+              <div className="bg-white bg-opacity-10 rounded p-2">
+                <p className="text-xs text-gray-200">Admin Account:</p>
+                <p>Email: admin@print.com</p>
+                <p>Password: admin123</p>
+              </div>
+              <div className="bg-white bg-opacity-10 rounded p-2">
+                <p className="text-xs text-gray-200">Student Account:</p>
+                <p>Email: student@print.com</p>
+                <p>Password: student123</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -260,4 +282,4 @@ function LoginPage({ setUser }) {
   );
 }
 
-export default LoginPage;
+export default LoginPageNew;

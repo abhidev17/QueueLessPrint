@@ -3,7 +3,7 @@ import API from "../api";
 import { CheckCircle, AlertCircle, Loader, RefreshCw, Printer, Trash2 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 
-function AdminPage() {
+function AdminPageNew({ user }) {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("Pending");
@@ -246,4 +246,4 @@ function AdminPage() {
   );
 }
 
-export default AdminPage;
+export default AdminPageNew;

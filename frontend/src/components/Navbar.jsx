@@ -4,10 +4,12 @@ import { useState } from "react";
 function Navbar({ setPage, user, onLogout }) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const isAdmin = user?.role === "admin";
+
   const menuItems = [
-    { id: "student", label: "Submit Print", icon: PrinterIcon },
-    { id: "jobs", label: "My Jobs", icon: FileText },
-    { id: "admin", label: "Admin Panel", icon: Settings }
+    ...(isAdmin ? [] : [{ id: "student", label: "Submit Print", icon: PrinterIcon }]),
+    ...(isAdmin ? [] : [{ id: "jobs", label: "My Jobs", icon: FileText }]),
+    ...(isAdmin ? [{ id: "admin", label: "Admin Panel", icon: Settings }] : [])
   ];
 
   return (
@@ -41,6 +43,9 @@ function Navbar({ setPage, user, onLogout }) {
           {/* User Info & Logout */}
           <div className="hidden md:flex items-center gap-4">
             <span className="text-sm font-medium opacity-90">{user?.name}</span>
+            <span className="text-xs bg-white bg-opacity-20 px-2 py-1 rounded">
+              {isAdmin ? "Admin" : "Student"}
+            </span>
             <button
               onClick={onLogout}
               className="flex items-center gap-2 bg-white bg-opacity-20 px-4 py-2 rounded-lg hover:bg-opacity-30 transition-all duration-200"
@@ -82,6 +87,7 @@ function Navbar({ setPage, user, onLogout }) {
               <div className="px-4 py-2">
                 <p className="text-sm opacity-75">Signed in as</p>
                 <p className="font-medium">{user?.name}</p>
+                <p className="text-xs opacity-75 mt-1">{isAdmin ? "Admin" : "Student"}</p>
               </div>
               <button
                 onClick={() => {

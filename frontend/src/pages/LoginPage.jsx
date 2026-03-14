@@ -26,6 +26,11 @@ const login = async (e) => {
   }
 
 };
+if (res.data.user.role === "admin") {
+ navigate("/admin");
+} else {
+ navigate("/student");
+}
   return (
 
     <div>

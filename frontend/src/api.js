@@ -10,6 +10,10 @@ API.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  // Don't force json content-type for FormData - let browser set it
+  if (config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
+  }
   return config;
 }, (error) => {
   return Promise.reject(error);
@@ -20,9 +24,16 @@ API.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      window.location.href = "/";
+      // Only clear and redirect if user is actually logged in
+      const user = localStorage.getItem("user");
+      if (user) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        // Reload to trigger login page
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 500);
+      }
     }
     return Promise.reject(error);
   }
