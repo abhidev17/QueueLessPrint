@@ -5,17 +5,18 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const { Server } = require("socket.io");
-app.get("/", (req, res) => {
-  res.send("QueueLessPrint Backend Running 🚀");
-});
-const userRoutes = requiapp.get("/", (req, res) => {
-  res.send("QueueLessPrint Backend Running 🚀");
-});re("./routes/userRoutes");
+
+const userRoutes = require("./routes/userRoutes");
 const printRoutes = require("./routes/printRoutes");
 const User = require("./models/User");
 
 const app = express();
 const server = http.createServer(app);
+
+// ROOT ROUTE
+app.get("/", (req, res) => {
+  res.send("QueueLessPrint Backend Running 🚀");
+});
 
 const io = new Server(server, {
   cors: {
