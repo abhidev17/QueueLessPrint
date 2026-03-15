@@ -13,6 +13,10 @@ function StudentPageNew({ user }) {
   const [slots, setSlots] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const safeSlots = Array.isArray(slots)
+    ? slots.filter((slot) => slot && typeof slot === "object" && slot.slot)
+    : [];
+
   // Check if user is admin
   const isAdmin = user?.role === "admin";
 
@@ -25,8 +29,14 @@ function StudentPageNew({ user }) {
   const loadSlots = async () => {
     try {
       const res = await API.get(`/print/slots?printDate=${printDate}`);
-      if (res.data && Array.isArray(res.data)) {
-        setSlots(res.data);
+      if (Array.isArray(res.data)) {
+        const normalizedSlots = res.data
+          .filter((slot) => slot && typeof slot === "object" && slot.slot)
+          .map((slot) => ({
+            slot: slot.slot,
+            available: Number.isFinite(Number(slot.available)) ? Number(slot.available) : 0
+          }));
+        setSlots(normalizedSlots);
       } else {
         setSlots([]);
       }
@@ -206,7 +216,7 @@ function StudentPageNew({ user }) {
                       onChange={(e) => setSlotTime(e.target.value)}
                       className="input-field"
                     >
-                      {slots.map(slot => (
+                      {safeSlots.map(slot => (
                         <option key={slot.slot} value={slot.slot} disabled={slot.available === 0}>
                           {slot.slot} ({slot.available} available)
                         </option>
@@ -244,7 +254,7 @@ function StudentPageNew({ user }) {
                   Availability
                 </h3>
                 <div className="space-y-3">
-                  {slots.map(slot => {
+                  {safeSlots.map(slot => {
                     const isFull = slot.available === 0;
                     return (
                       <div

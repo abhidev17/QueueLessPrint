@@ -1,6 +1,6 @@
 import { useState } from "react";
 import API from "../api";
-import { Mail, Lock, User, Eye, EyeOff, PrinterIcon } from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff, Printer } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 
 function LoginPageNew({ setUser }) {
@@ -94,7 +94,7 @@ function LoginPageNew({ setUser }) {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
-              <PrinterIcon size={48} className="text-white" />
+              <Printer size={48} className="text-white" />
             </div>
             <h1 className="text-4xl font-bold text-white mb-2">QueueLess Print</h1>
             <p className="text-white text-opacity-80">Fast & Easy Printing System</p>

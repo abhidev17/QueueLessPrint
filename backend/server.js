@@ -1,14 +1,34 @@
 require("dotenv").config();
 const express = require("express");
+const http = require("http");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
+const { Server } = require("socket.io");
 
 const userRoutes = require("./routes/userRoutes");
 const printRoutes = require("./routes/printRoutes");
 const User = require("./models/User");
 
 const app = express();
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
+    methods: ["GET", "POST", "PUT"]
+  }
+});
+
+app.set("io", io);
+
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});
 
 app.use(cors());
 app.use(express.json());
@@ -63,6 +83,6 @@ mongoose.connect(MONGODB_URI)
   })
   .catch(err => console.error("MongoDB Connection Error:", err));
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import API from "../api";
-import { FileText, Clock, CheckCircle, AlertCircle, Loader } from "lucide-react";
+import socket from "../socket";
+import { FileText, Clock, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 
 function StudentJobsNew({ user }) {
@@ -9,6 +10,18 @@ function StudentJobsNew({ user }) {
 
   useEffect(() => {
     loadJobs();
+
+    const handleJobUpdated = (updatedJob) => {
+      setJobs((prevJobs) =>
+        prevJobs.map((job) => (job._id === updatedJob._id ? { ...job, ...updatedJob } : job))
+      );
+    };
+
+    socket.on("jobUpdated", handleJobUpdated);
+
+    return () => {
+      socket.off("jobUpdated", handleJobUpdated);
+    };
   }, []);
 
   const loadJobs = async () => {
@@ -42,7 +55,7 @@ function StudentJobsNew({ user }) {
       case "Completed":
         return <CheckCircle size={20} />;
       case "Printing":
-        return <Loader size={20} className="animate-spin" />;
+        return <Loader2 size={20} className="animate-spin" />;
       case "Pending":
         return <AlertCircle size={20} />;
       default:
@@ -54,7 +67,7 @@ function StudentJobsNew({ user }) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <Loader size={48} className="animate-spin text-indigo-600 mx-auto mb-4" />
+          <Loader2 size={48} className="animate-spin text-indigo-600 mx-auto mb-4" />
           <p className="text-gray-600">Loading your jobs...</p>
         </div>
       </div>

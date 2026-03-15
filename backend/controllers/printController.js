@@ -92,6 +92,11 @@ exports.updatePrintStatus = async (req, res) => {
       return res.status(404).json({ message: "Print job not found" });
     }
 
+    const io = req.app.get("io");
+    if (io) {
+      io.emit("jobUpdated", job);
+    }
+
     res.json({
       message: "Status updated successfully",
       job

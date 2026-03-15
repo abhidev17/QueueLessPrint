@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import API from "../api";
-import { CheckCircle, AlertCircle, Loader, RefreshCw, Printer, Trash2 } from "lucide-react";
+import { CheckCircle, AlertCircle, Loader2, RefreshCw, Printer, Trash2 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 
 function AdminPageNew({ user }) {
@@ -64,7 +64,7 @@ function AdminPageNew({ user }) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <Loader size={48} className="animate-spin text-indigo-600 mx-auto mb-4" />
+          <Loader2 size={48} className="animate-spin text-indigo-600 mx-auto mb-4" />
           <p className="text-gray-600">Loading jobs...</p>
         </div>
       </div>
