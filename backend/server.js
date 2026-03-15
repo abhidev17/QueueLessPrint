@@ -5,7 +5,9 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const { Server } = require("socket.io");
-
+app.get("/", (req, res) => {
+  res.send("QueueLessPrint Backend Running 🚀");
+});
 const userRoutes = require("./routes/userRoutes");
 const printRoutes = require("./routes/printRoutes");
 const User = require("./models/User");
