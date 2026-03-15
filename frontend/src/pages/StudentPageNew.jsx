@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import API from "../api";
-import { Upload, Calendar, Copy, FileText, Loader, AlertCircle } from "lucide-react";
+import { Upload, Calendar, Copy, FileText, Loader2, AlertCircle } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 
 function StudentPageNew({ user }) {
@@ -222,7 +222,7 @@ function StudentPageNew({ user }) {
                   >
                     {loading ? (
                       <>
-                        <Loader size={20} className="animate-spin" />
+                        <Loader2 size={20} className="animate-spin" />
                         Submitting...
                       </>
                     ) : (
