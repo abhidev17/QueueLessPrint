@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import API from "../api";
-import { CheckCircle, AlertCircle, Loader2, RefreshCw, Printer, Trash2 } from "lucide-react";
+import { AlertCircle, Loader2, RefreshCw, Printer } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 
 function AdminPageNew({ user }) {
@@ -38,13 +38,13 @@ function AdminPageNew({ user }) {
   const getStatusColor = (status) => {
     switch (status) {
       case "Completed":
-        return "bg-green-100 border-green-300 text-green-900";
+        return "bg-emerald-100 border-emerald-300 text-emerald-900";
       case "Printing":
-        return "bg-blue-100 border-blue-300 text-blue-900";
+        return "bg-cyan-100 border-cyan-300 text-cyan-900";
       case "Pending":
-        return "bg-yellow-100 border-yellow-300 text-yellow-900";
+        return "bg-amber-100 border-amber-300 text-amber-900";
       default:
-        return "bg-gray-100 border-gray-300 text-gray-900";
+        return "bg-slate-100 border-slate-300 text-slate-900";
     }
   };
 
@@ -62,10 +62,10 @@ function AdminPageNew({ user }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-white to-amber-50 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 size={48} className="animate-spin text-indigo-600 mx-auto mb-4" />
-          <p className="text-gray-600">Loading jobs...</p>
+          <Loader2 size={48} className="animate-spin text-cyan-600 mx-auto mb-4" />
+          <p className="text-slate-600">Loading jobs...</p>
         </div>
       </div>
     );
@@ -74,16 +74,16 @@ function AdminPageNew({ user }) {
   return (
     <>
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-white to-amber-50 py-12 px-4">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 fade-in-up">
             <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+              <h1 className="text-4xl font-bold text-slate-900 mb-2 flex items-center gap-2">
                 <Printer size={32} />
                 Admin Dashboard
               </h1>
-              <p className="text-gray-600">Manage and monitor all print jobs</p>
+              <p className="text-slate-600">Manage and monitor all print jobs</p>
             </div>
             <button
               onClick={loadJobs}
@@ -95,14 +95,14 @@ function AdminPageNew({ user }) {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 stagger">
             {[
-              { label: "Total Jobs", value: stats.total, color: "bg-indigo-100 text-indigo-600" },
-              { label: "Pending", value: stats.pending, color: "bg-yellow-100 text-yellow-600" },
-              { label: "Printing", value: stats.printing, color: "bg-blue-100 text-blue-600" },
-              { label: "Completed", value: stats.completed, color: "bg-green-100 text-green-600" }
+              { label: "Total Jobs", value: stats.total, color: "bg-cyan-100 text-cyan-700" },
+              { label: "Pending", value: stats.pending, color: "bg-amber-100 text-amber-700" },
+              { label: "Printing", value: stats.printing, color: "bg-sky-100 text-sky-700" },
+              { label: "Completed", value: stats.completed, color: "bg-emerald-100 text-emerald-700" }
             ].map((stat, idx) => (
-              <div key={idx} className={`${stat.color} rounded-lg p-4 text-center`}>
+              <div key={idx} className={`${stat.color} rounded-xl p-4 text-center border border-white/60 hover-lift`}>
                 <p className="text-sm font-medium opacity-75">{stat.label}</p>
                 <p className="text-3xl font-bold">{stat.value}</p>
               </div>
@@ -117,8 +117,8 @@ function AdminPageNew({ user }) {
                 onClick={() => setFilter(status)}
                 className={`px-4 py-2 rounded-lg font-medium transition-all ${
                   filter === status
-                    ? "bg-indigo-600 text-white"
-                    : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                    ? "bg-cyan-600 text-white"
+                    : "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50"
                 }`}
               >
                 {status}
@@ -129,42 +129,42 @@ function AdminPageNew({ user }) {
           {/* Jobs Table / Cards */}
           {filteredJobs.length === 0 ? (
             <div className="card text-center py-12">
-              <AlertCircle size={48} className="mx-auto mb-4 text-gray-400" />
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">No Jobs Found</h3>
-              <p className="text-gray-600">No print jobs in this category</p>
+              <AlertCircle size={48} className="mx-auto mb-4 text-slate-400" />
+              <h3 className="text-xl font-semibold text-slate-700 mb-2">No Jobs Found</h3>
+              <p className="text-slate-600">No print jobs in this category</p>
             </div>
           ) : (
             <div className="hidden lg:block">
               {/* Desktop Table */}
               <div className="card overflow-hidden">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+                  <thead className="bg-cyan-50 border-b border-cyan-100">
                     <tr>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Student</th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">File</th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Details</th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Slot</th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Actions</th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Student</th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">File</th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Details</th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Slot</th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Status</th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-slate-900">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
+                  <tbody className="divide-y divide-slate-200">
                     {filteredJobs.map(job => (
-                      <tr key={job._id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                      <tr key={job._id} className="hover:bg-cyan-50/50 transition-colors">
+                        <td className="px-6 py-4 text-sm font-medium text-slate-900">
                           {job.userId?.name || "Unknown"}
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-600 truncate">
+                        <td className="px-6 py-4 text-sm text-slate-600 truncate">
                           {job.fileName}
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-600">
+                        <td className="px-6 py-4 text-sm text-slate-600">
                           <div className="flex gap-2 text-xs">
-                            <span className="bg-gray-100 px-2 py-1 rounded">{job.copies}x</span>
-                            <span className="bg-gray-100 px-2 py-1 rounded">{job.pageSize}</span>
-                            <span className="bg-gray-100 px-2 py-1 rounded">{job.color ? "Color" : "B&W"}</span>
+                            <span className="bg-slate-100 px-2 py-1 rounded">{job.copies}x</span>
+                            <span className="bg-slate-100 px-2 py-1 rounded">{job.pageSize}</span>
+                            <span className="bg-slate-100 px-2 py-1 rounded">{job.color ? "Color" : "B&W"}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                        <td className="px-6 py-4 text-sm font-medium text-slate-900">
                           {job.slotTime}
                         </td>
                         <td className="px-6 py-4">
@@ -176,14 +176,14 @@ function AdminPageNew({ user }) {
                           {job.status !== "Completed" && (
                             <button
                               onClick={() => updateStatus(job._id, "Printing")}
-                              className="px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                              className="px-3 py-1 bg-cyan-100 text-cyan-700 rounded hover:bg-cyan-200 transition-colors"
                             >
                               Print
                             </button>
                           )}
                           <button
                             onClick={() => updateStatus(job._id, "Completed")}
-                            className="px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors"
+                            className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded hover:bg-emerald-200 transition-colors"
                           >
                             Done
                           </button>
@@ -197,42 +197,42 @@ function AdminPageNew({ user }) {
           )}
 
           {/* Mobile Cards */}
-          <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 stagger">
             {filteredJobs.map(job => (
-              <div key={job._id} className={`card border-2 ${getStatusColor(job.status)}`}>
+              <div key={job._id} className={`card border-2 hover-lift ${getStatusColor(job.status)}`}>
                 <div className="mb-3">
-                  <p className="text-xs text-gray-600 uppercase tracking-wide">Student</p>
-                  <p className="font-semibold text-gray-900">{job.userId?.name || "Unknown"}</p>
+                  <p className="text-xs text-slate-600 uppercase tracking-wide">Student</p>
+                  <p className="font-semibold text-slate-900">{job.userId?.name || "Unknown"}</p>
                 </div>
 
                 <div className="mb-3">
-                  <p className="text-xs text-gray-600 uppercase tracking-wide">File</p>
-                  <p className="font-medium text-gray-800 truncate">{job.fileName}</p>
+                  <p className="text-xs text-slate-600 uppercase tracking-wide">File</p>
+                  <p className="font-medium text-slate-800 truncate">{job.fileName}</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
                   <div>
-                    <p className="text-xs text-gray-600">Copies: {job.copies}</p>
-                    <p className="text-xs text-gray-600">Size: {job.pageSize}</p>
+                    <p className="text-xs text-slate-600">Copies: {job.copies}</p>
+                    <p className="text-xs text-slate-600">Size: {job.pageSize}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-600">Color: {job.color ? "Yes" : "No"}</p>
-                    <p className="text-xs text-gray-600">Slot: {job.slotTime}</p>
+                    <p className="text-xs text-slate-600">Color: {job.color ? "Yes" : "No"}</p>
+                    <p className="text-xs text-slate-600">Slot: {job.slotTime}</p>
                   </div>
                 </div>
 
-                <div className="flex gap-2 pt-3 border-t border-gray-200">
+                <div className="flex gap-2 pt-3 border-t border-slate-200">
                   {job.status !== "Completed" && (
                     <button
                       onClick={() => updateStatus(job._id, "Printing")}
-                      className="flex-1 px-2 py-1 bg-blue-100 text-blue-700 text-sm rounded hover:bg-blue-200"
+                      className="flex-1 px-2 py-1 bg-cyan-100 text-cyan-700 text-sm rounded hover:bg-cyan-200"
                     >
                       Print
                     </button>
                   )}
                   <button
                     onClick={() => updateStatus(job._id, "Completed")}
-                    className="flex-1 px-2 py-1 bg-green-100 text-green-700 text-sm rounded hover:bg-green-200"
+                    className="flex-1 px-2 py-1 bg-emerald-100 text-emerald-700 text-sm rounded hover:bg-emerald-200"
                   >
                     Done
                   </button>

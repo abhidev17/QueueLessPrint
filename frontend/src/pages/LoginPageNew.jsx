@@ -90,24 +90,24 @@ function LoginPageNew({ setUser }) {
   return (
     <>
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-cyan-900 to-emerald-800 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <div className="text-center mb-8">
+          <div className="text-center mb-8 fade-in-up">
             <div className="flex justify-center mb-4">
               <Printer size={48} className="text-white" />
             </div>
             <h1 className="text-4xl font-bold text-white mb-2">QueueLess Print</h1>
-            <p className="text-white text-opacity-80">Fast & Easy Printing System</p>
+            <p className="text-cyan-100">Fast and easy printing system</p>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-2xl p-8">
+          <div className="bg-white/95 rounded-2xl shadow-2xl p-8 border border-white/30 backdrop-blur-sm fade-in-up">
             <div className="flex gap-2 mb-8">
               <button
                 onClick={() => setIsLogin(true)}
                 className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
                   isLogin
-                    ? "bg-indigo-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    ? "bg-cyan-600 text-white"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                 }`}
               >
                 Sign In
@@ -116,8 +116,8 @@ function LoginPageNew({ setUser }) {
                 onClick={() => setIsLogin(false)}
                 className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
                   !isLogin
-                    ? "bg-indigo-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    ? "bg-cyan-600 text-white"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                 }`}
               >
                 Register
@@ -173,8 +173,8 @@ function LoginPageNew({ setUser }) {
                   {loading ? "Signing in..." : "Sign In"}
                 </button>
 
-                <p className="text-xs text-gray-500 mt-4 text-center">
-                  🔒 Don't have an account? Switch to the Register tab to create one.
+                <p className="text-xs text-slate-500 mt-4 text-center">
+                  Do not have an account? Switch to Register to create one.
                 </p>
               </form>
             ) : (
@@ -261,16 +261,16 @@ function LoginPageNew({ setUser }) {
             )}
           </div>
 
-          <div className="mt-8 bg-white bg-opacity-10 rounded-lg p-4 text-white text-sm">
-            <p className="font-medium mb-3">📋 Demo Credentials:</p>
+          <div className="mt-8 bg-slate-900/35 border border-white/20 rounded-lg p-4 text-white text-sm backdrop-blur-sm fade-in-up">
+            <p className="font-medium mb-3">Demo Credentials:</p>
             <div className="space-y-2">
-              <div className="bg-white bg-opacity-10 rounded p-2">
-                <p className="text-xs text-gray-200">Admin Account:</p>
+              <div className="bg-white/10 rounded p-2">
+                <p className="text-xs text-cyan-100">Admin Account:</p>
                 <p>Email: admin@print.com</p>
                 <p>Password: admin123</p>
               </div>
-              <div className="bg-white bg-opacity-10 rounded p-2">
-                <p className="text-xs text-gray-200">Student Account:</p>
+              <div className="bg-white/10 rounded p-2">
+                <p className="text-xs text-cyan-100">Student Account:</p>
                 <p>Email: student@print.com</p>
                 <p>Password: student123</p>
               </div>

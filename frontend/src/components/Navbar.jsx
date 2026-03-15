@@ -1,4 +1,4 @@
-import { LogOut, Menu, X, Printer, FileText, Settings } from "lucide-react";
+import { LogOut, Menu, X, Printer, FileText, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 
 function Navbar({ setPage, user, onLogout }) {
@@ -9,7 +9,7 @@ function Navbar({ setPage, user, onLogout }) {
   const menuItems = [
     ...(isAdmin ? [] : [{ id: "student", label: "Submit Print", icon: Printer }]),
     ...(isAdmin ? [] : [{ id: "jobs", label: "My Jobs", icon: FileText }]),
-    ...(isAdmin ? [{ id: "admin", label: "Admin Panel", icon: Settings }] : [])
+    ...(isAdmin ? [{ id: "admin", label: "Admin Panel", icon: ShieldCheck }] : [])
   ];
 
   return (

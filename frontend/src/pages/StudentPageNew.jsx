@@ -51,10 +51,10 @@ function StudentPageNew({ user }) {
   if (isAdmin) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-8 text-center">
-          <AlertCircle className="mx-auto mb-4 text-yellow-600" size={48} />
-          <h2 className="text-2xl font-bold text-yellow-800 mb-2">Admin Access</h2>
-          <p className="text-yellow-700">
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-8 text-center">
+          <AlertCircle className="mx-auto mb-4 text-amber-600" size={48} />
+          <h2 className="text-2xl font-bold text-amber-900 mb-2">Admin Access</h2>
+          <p className="text-amber-800">
             This page is for students only. Please use the Admin Panel to manage print jobs.
           </p>
         </div>
@@ -104,24 +104,24 @@ function StudentPageNew({ user }) {
   return (
     <>
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-white to-amber-50 py-12 px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Submit Print Job</h1>
-            <p className="text-gray-600">Upload your document and choose your preferences</p>
+          <div className="mb-10 fade-in-up">
+            <h1 className="text-4xl font-bold text-slate-900 mb-2">Submit Print Job</h1>
+            <p className="text-slate-600">Upload your document and choose your preferences</p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 stagger">
             {/* Form */}
             <div className="lg:col-span-2">
-              <div className="card">
+              <div className="card hover-lift">
                 <form onSubmit={submitPrint} className="space-y-6">
                   {/* File Upload */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    <label className="block text-sm font-semibold text-slate-700 mb-3">
                       Upload Document
                     </label>
-                    <div className="border-2 border-dashed border-indigo-300 rounded-lg p-8 text-center hover:border-indigo-500 transition-colors">
+                    <div className="border-2 border-dashed border-cyan-300 rounded-xl p-8 text-center hover:border-cyan-500 bg-cyan-50/40 transition-colors">
                       <input
                         type="file"
                         onChange={(e) => setFile(e.target.files[0])}
@@ -130,26 +130,26 @@ function StudentPageNew({ user }) {
                         accept=".pdf,.doc,.docx,.txt,.jpg,.png"
                       />
                       <label htmlFor="file-input" className="cursor-pointer">
-                        <Upload className="mx-auto mb-3 text-indigo-600" size={32} />
-                        <p className="text-sm text-gray-600">
+                        <Upload className="mx-auto mb-3 text-cyan-700" size={32} />
+                        <p className="text-sm text-slate-600">
                           {file ? (
                             <>File: {file.name}</>
                           ) : (
                             <>Click to upload or drag and drop</>
                           )}
                         </p>
-                        <p className="text-xs text-gray-500">Supported: PDF, DOC, DOCX, TXT, Images</p>
+                        <p className="text-xs text-slate-500">Supported: PDF, DOC, DOCX, TXT, Images</p>
                       </label>
                     </div>
                   </div>
 
                   {/* Date Selection */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    <label className="block text-sm font-semibold text-slate-700 mb-3">
                       Print Date
                     </label>
                     <div className="relative">
-                      <Calendar className="absolute left-3 top-3 text-gray-400" size={20} />
+                      <Calendar className="absolute left-3 top-3 text-slate-400" size={20} />
                       <input
                         type="date"
                         value={printDate}
@@ -163,7 +163,7 @@ function StudentPageNew({ user }) {
 
                   {/* Copies */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    <label className="block text-sm font-semibold text-slate-700 mb-3">
                       Number of Copies
                     </label>
                     <input
@@ -178,7 +178,7 @@ function StudentPageNew({ user }) {
 
                   {/* Page Size */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    <label className="block text-sm font-semibold text-slate-700 mb-3">
                       Page Size
                     </label>
                     <select
@@ -193,22 +193,22 @@ function StudentPageNew({ user }) {
                   </div>
 
                   {/* Color Option */}
-                  <div className="flex items-center gap-3 p-4 bg-indigo-50 rounded-lg">
+                  <div className="flex items-center gap-3 p-4 bg-cyan-50 rounded-xl border border-cyan-100">
                     <input
                       type="checkbox"
                       id="color"
                       checked={color}
                       onChange={(e) => setColor(e.target.checked)}
-                      className="w-4 h-4 text-indigo-600 rounded"
+                      className="w-4 h-4 text-cyan-600 rounded"
                     />
-                    <label htmlFor="color" className="text-sm font-medium text-gray-700 cursor-pointer">
+                    <label htmlFor="color" className="text-sm font-medium text-slate-700 cursor-pointer">
                       Color Printing (₹5 extra per page)
                     </label>
                   </div>
 
                   {/* Slot Selection */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    <label className="block text-sm font-semibold text-slate-700 mb-3">
                       Select Time Slot
                     </label>
                     <select
@@ -248,12 +248,12 @@ function StudentPageNew({ user }) {
 
             {/* Slot Availability */}
             <div>
-              <div className="card sticky top-24">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <div className="card sticky top-24 hover-lift">
+                <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
                   <Calendar size={20} />
                   Availability
                 </h3>
-                <div className="space-y-3">
+                <div className="space-y-3 stagger">
                   {safeSlots.map(slot => {
                     const isFull = slot.available === 0;
                     return (
@@ -261,12 +261,12 @@ function StudentPageNew({ user }) {
                         key={slot.slot}
                         className={`p-3 rounded-lg text-center ${
                           isFull
-                            ? "bg-red-100 border border-red-300"
-                            : "bg-green-100 border border-green-300"
+                            ? "bg-rose-50 border border-rose-200"
+                            : "bg-emerald-50 border border-emerald-200"
                         }`}
                       >
-                        <p className="font-semibold text-gray-900">{slot.slot}</p>
-                        <p className={`text-sm ${isFull ? "text-red-700" : "text-green-700"}`}>
+                        <p className="font-semibold text-slate-900">{slot.slot}</p>
+                        <p className={`text-sm ${isFull ? "text-rose-700" : "text-emerald-700"}`}>
                           {isFull ? "FULL" : `${slot.available} available`}
                         </p>
                       </div>

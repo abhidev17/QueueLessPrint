@@ -35,36 +35,36 @@ function Dashboard({ user }) {
       label: "Total Jobs",
       value: stats.total,
       icon: Printer,
-      tone: "text-indigo-600 bg-indigo-50 border-indigo-100"
+      tone: "text-cyan-700 bg-cyan-50 border-cyan-200"
     },
     {
       label: "Pending",
       value: stats.pending,
       icon: Clock,
-      tone: "text-amber-600 bg-amber-50 border-amber-100"
+      tone: "text-amber-700 bg-amber-50 border-amber-200"
     },
     {
       label: "Completed",
       value: stats.completed,
       icon: CheckCircle,
-      tone: "text-emerald-600 bg-emerald-50 border-emerald-100"
+      tone: "text-emerald-700 bg-emerald-50 border-emerald-200"
     }
   ];
 
   return (
-    <div>
-      <div className="mb-8 pt-12 md:pt-0">
-        <h1 className="text-3xl md:text-4xl font-bold text-slate-900">Dashboard</h1>
+    <div className="fade-in-up">
+      <div className="mb-10 pt-12 md:pt-0">
+        <h1 className="text-3xl md:text-4xl font-bold text-slate-950">Dashboard</h1>
         <p className="text-slate-600 mt-2">
           Welcome back, {user?.name}. Here is your print activity snapshot.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 stagger">
         {cards.map((card) => {
           const Icon = card.icon;
           return (
-            <div key={card.label} className={`border rounded-xl p-6 shadow-sm ${card.tone}`}>
+            <div key={card.label} className={`border rounded-2xl p-6 shadow-sm hover-lift ${card.tone}`}>
               <Icon size={28} className="mb-3" />
               <h2 className="text-lg font-semibold">{card.label}</h2>
               <p className="text-3xl font-bold mt-1">{card.value}</p>
@@ -73,7 +73,7 @@ function Dashboard({ user }) {
         })}
       </div>
 
-      <div className="mt-8 bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+      <div className="mt-8 bg-gradient-to-r from-white to-cyan-50 rounded-2xl border border-cyan-100 p-6 shadow-sm hover-lift">
         <div className="flex items-center gap-2 text-slate-800 mb-2">
           <Activity size={18} />
           <h3 className="font-semibold">Quick Insight</h3>

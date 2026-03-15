@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   Printer,
   FileText,
-  Settings,
   LogOut,
   LayoutDashboard,
   Menu,
@@ -18,15 +17,14 @@ function Sidebar({ setPage, page, user, onLogout }) {
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     ...(isAdmin ? [] : [{ id: "student", label: "Submit Print", icon: Printer }]),
     ...(isAdmin ? [] : [{ id: "jobs", label: "My Jobs", icon: FileText }]),
-    ...(isAdmin ? [{ id: "admin", label: "Admin Panel", icon: ShieldCheck }] : []),
-    { id: "settings", label: "Settings", icon: Settings }
+    ...(isAdmin ? [{ id: "admin", label: "Admin Panel", icon: ShieldCheck }] : [])
   ];
 
   const sidebarContent = (
     <>
-      <div className="mb-8 border-b border-white/10 pb-4">
+      <div className="mb-8 border-b border-white/15 pb-4">
         <h1 className="text-xl font-bold tracking-tight">QueueLess Print</h1>
-        <p className="text-xs text-slate-400 mt-1">
+        <p className="text-xs text-slate-300 mt-1">
           {isAdmin ? "Admin Workspace" : "Student Workspace"}
         </p>
       </div>
@@ -44,8 +42,8 @@ function Sidebar({ setPage, page, user, onLogout }) {
               }}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg text-left transition ${
                 active
-                  ? "bg-white text-slate-900"
-                  : "text-slate-200 hover:bg-slate-800 hover:text-white"
+                  ? "bg-cyan-300 text-slate-900 shadow-sm"
+                  : "text-slate-100 hover:bg-white/10 hover:text-white"
               }`}
             >
               <Icon size={18} />
@@ -55,14 +53,14 @@ function Sidebar({ setPage, page, user, onLogout }) {
         })}
       </div>
 
-      <div className="pt-4 border-t border-white/10 space-y-3">
+      <div className="pt-4 border-t border-white/15 space-y-3">
         <div>
           <p className="text-sm font-medium text-white truncate">{user?.name}</p>
-          <p className="text-xs text-slate-400">{isAdmin ? "Admin" : "Student"}</p>
+          <p className="text-xs text-slate-300">{isAdmin ? "Admin" : "Student"}</p>
         </div>
         <button
           onClick={onLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-red-500/90 hover:bg-red-500 transition"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg bg-rose-500/90 hover:bg-rose-500 transition"
         >
           <LogOut size={18} />
           <span className="text-sm font-medium">Logout</span>
@@ -73,7 +71,7 @@ function Sidebar({ setPage, page, user, onLogout }) {
 
   return (
     <>
-      <aside className="hidden md:flex md:w-64 md:h-screen md:sticky md:top-0 bg-slate-900 text-white flex-col p-4 shadow-xl">
+      <aside className="hidden md:flex md:w-64 md:h-screen md:sticky md:top-0 bg-gradient-to-b from-slate-950 via-slate-900 to-cyan-950 text-white flex-col p-4 shadow-xl">
         {sidebarContent}
       </aside>
 
@@ -87,7 +85,7 @@ function Sidebar({ setPage, page, user, onLogout }) {
       {open && (
         <div className="md:hidden fixed inset-0 z-30 bg-black/40" onClick={() => setOpen(false)}>
           <aside
-            className="w-72 h-full bg-slate-900 text-white flex flex-col p-4"
+            className="w-72 h-full bg-gradient-to-b from-slate-950 via-slate-900 to-cyan-950 text-white flex flex-col p-4"
             onClick={(e) => e.stopPropagation()}
           >
             {sidebarContent}
