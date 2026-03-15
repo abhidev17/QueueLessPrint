@@ -44,9 +44,9 @@ io.on("connection", (socket) => {
 });
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use(express.json());
 
