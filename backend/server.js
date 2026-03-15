@@ -37,7 +37,6 @@ app.use("/api/users", userRoutes);
 app.use("/api/print", printRoutes);
 
 const MONGODB_URI = process.env.MONGO_URI || process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/queuelessprint";
-const PORT = process.env.PORT || 5000;
 
 const createAdmin = async () => {
   try {
@@ -82,6 +81,9 @@ mongoose.connect(MONGODB_URI)
     createAdmin();
   })
   .catch(err => console.log("MongoDB connection error:", err));
+
+
+const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
