@@ -1,4 +1,4 @@
-import { LogOut, Menu, X, PrinterIcon, FileText, Settings } from "lucide-react";
+import { LogOut, Menu, X, Printer, FileText, Settings } from "lucide-react";
 import { useState } from "react";
 
 function Navbar({ setPage, user, onLogout }) {
@@ -7,7 +7,7 @@ function Navbar({ setPage, user, onLogout }) {
   const isAdmin = user?.role === "admin";
 
   const menuItems = [
-    ...(isAdmin ? [] : [{ id: "student", label: "Submit Print", icon: PrinterIcon }]),
+    ...(isAdmin ? [] : [{ id: "student", label: "Submit Print", icon: Printer }]),
     ...(isAdmin ? [] : [{ id: "jobs", label: "My Jobs", icon: FileText }]),
     ...(isAdmin ? [{ id: "admin", label: "Admin Panel", icon: Settings }] : [])
   ];
@@ -18,7 +18,7 @@ function Navbar({ setPage, user, onLogout }) {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <PrinterIcon size={28} className="animate-bounce" />
+            <Printer size={28} className="animate-bounce" />
             <h1 className="text-2xl font-bold hidden sm:block">QueueLess Print</h1>
             <h1 className="text-2xl font-bold sm:hidden">QLP</h1>
           </div>
