@@ -15,12 +15,19 @@ const server = http.createServer(app);
 
 // ROOT ROUTE
 app.get("/", (req, res) => {
-  res.send("QueueLessPrint Backend Running 🚀");
+  res.send("QueueLessPrint API running 🚀");
 });
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:5175",
+  "https://queue-less-print.vercel.app"
+];
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT"]
   }
 });
@@ -35,7 +42,7 @@ io.on("connection", (socket) => {
   });
 });
 
-app.use(cors());
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 
 app.use("/api/users", userRoutes);
