@@ -8,7 +8,9 @@ const { Server } = require("socket.io");
 app.get("/", (req, res) => {
   res.send("QueueLessPrint Backend Running 🚀");
 });
-const userRoutes = require("./routes/userRoutes");
+const userRoutes = requiapp.get("/", (req, res) => {
+  res.send("QueueLessPrint Backend Running 🚀");
+});re("./routes/userRoutes");
 const printRoutes = require("./routes/printRoutes");
 const User = require("./models/User");
 
