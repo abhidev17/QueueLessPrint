@@ -177,7 +177,7 @@ For stricter production security, replace origin: "*" with an allowlist of trust
 - npm run preview -> preview production build
 - npm run lint -> run ESLint
 
-## Additional Docs
+## Additional Docs -----
 
 - SETUP_GUIDE.md
 - IMPROVEMENTS.md
