@@ -11,12 +11,15 @@ import {
 
 function Sidebar({ setPage, page, user, onLogout }) {
   const [open, setOpen] = useState(false);
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role === "admin" || user?.role === "superadmin";
+  const isStaff = user?.role === "staff" || isAdmin;
+  const isStudent = user?.role === "student";
 
   const items = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    ...(isAdmin ? [] : [{ id: "student", label: "Submit Print", icon: Printer }]),
-    ...(isAdmin ? [] : [{ id: "jobs", label: "My Jobs", icon: FileText }]),
+    ...(isStudent ? [{ id: "student", label: "Submit Print", icon: Printer }] : []),
+    ...(isStudent ? [{ id: "jobs", label: "My Jobs", icon: FileText }] : []),
+    ...(isStaff && !isAdmin ? [{ id: "staff", label: "Print Queue", icon: Printer }] : []),
     ...(isAdmin ? [{ id: "admin", label: "Admin Panel", icon: ShieldCheck }] : [])
   ];
 
@@ -25,7 +28,13 @@ function Sidebar({ setPage, page, user, onLogout }) {
       <div className="mb-8 border-b border-white/15 pb-4">
         <h1 className="text-xl font-bold tracking-tight">QueueLess Print</h1>
         <p className="text-xs text-slate-300 mt-1">
-          {isAdmin ? "Admin Workspace" : "Student Workspace"}
+          {user?.role === "superadmin"
+            ? "Super Admin Workspace"
+            : isAdmin
+            ? "Admin Workspace"
+            : isStaff
+            ? "Staff Workspace"
+            : "Student Workspace"}
         </p>
       </div>
 
@@ -56,7 +65,9 @@ function Sidebar({ setPage, page, user, onLogout }) {
       <div className="pt-4 border-t border-white/15 space-y-3">
         <div>
           <p className="text-sm font-medium text-white truncate">{user?.name}</p>
-          <p className="text-xs text-slate-300">{isAdmin ? "Admin" : "Student"}</p>
+          <p className="text-xs text-slate-300 capitalize">
+            {user?.role === "superadmin" ? "SUPER ADMIN" : user?.role}
+          </p>
         </div>
         <button
           onClick={onLogout}

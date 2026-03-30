@@ -98,16 +98,23 @@ exports.deleteUser = async (req, res) => {
       return res.status(400).json({ message: "User ID is required" });
     }
 
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Protect superadmin
+    if (user.email === "admin@gmail.com" || user.role === "superadmin") {
+      return res.status(403).json({ message: "Cannot delete super admin account" });
+    }
+
     // Prevent deleting yourself
     if (req.user.userId === id) {
       return res.status(400).json({ message: "Cannot delete your own account" });
     }
 
-    const user = await User.findByIdAndDelete(id);
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    await User.findByIdAndDelete(id);
 
     res.json({ message: "User deleted successfully", user });
   } catch (error) {
@@ -126,8 +133,19 @@ exports.updateUser = async (req, res) => {
       return res.status(400).json({ message: "User ID is required" });
     }
 
-    if (!role || !["student", "admin"].includes(role)) {
-      return res.status(400).json({ message: "Invalid role. Must be 'student' or 'admin'" });
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Protect superadmin
+    if (user.email === "admin@gmail.com" || user.role === "superadmin") {
+      return res.status(403).json({ message: "Cannot modify super admin account" });
+    }
+
+    if (!role || !["student", "admin", "staff"].includes(role)) {
+      return res.status(400).json({ message: "Invalid role. Must be 'student', 'staff', or 'admin'" });
     }
 
     // Prevent changing your own role
@@ -140,10 +158,6 @@ exports.updateUser = async (req, res) => {
       { role },
       { new: true }
     ).select("-password");
-
-    if (!updated) {
-      return res.status(404).json({ message: "User not found" });
-    }
 
     res.json({ message: "User role updated successfully", user: updated });
   } catch (error) {

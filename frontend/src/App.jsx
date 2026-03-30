@@ -10,11 +10,12 @@ import AdminPageNew from "./pages/AdminPageNew";
 import AdminUsersPage from "./pages/AdminUsersPage";
 import AdminPrintJobsPage from "./pages/AdminPrintJobsPage";
 import AdminReportsPage from "./pages/AdminReportsPage";
+import StaffDashboard from "./pages/StaffDashboard";
 import ErrorBoundary from "./components/ErrorBoundary";
 import "react-toastify/dist/ReactToastify.css";
 
-// Protected Route Wrapper
-function ProtectedRoute({ children, requiredRole = null }) {
+// Protected Route Wrapper with Multiple Roles Support
+function ProtectedRoute({ children, allowedRoles = null }) {
   const { user, loading } = useAuth();
 
   if (loading) return <div>Loading...</div>;
@@ -23,7 +24,7 @@ function ProtectedRoute({ children, requiredRole = null }) {
     return <Navigate to="/auth" replace />;
   }
 
-  if (requiredRole && user.role !== requiredRole) {
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -64,7 +65,7 @@ function AppContent() {
       <Route
         path="/submit-job"
         element={
-          <ProtectedRoute requiredRole="student">
+          <ProtectedRoute allowedRoles={["student"]}>
             <AppLayout currentPage="Submit Job">
               <StudentPageNew user={user} />
             </AppLayout>
@@ -75,7 +76,7 @@ function AppContent() {
       <Route
         path="/my-jobs"
         element={
-          <ProtectedRoute requiredRole="student">
+          <ProtectedRoute allowedRoles={["student"]}>
             <AppLayout currentPage="My Jobs">
               <StudentJobsNew user={user} />
             </AppLayout>
@@ -83,10 +84,11 @@ function AppContent() {
         }
       />
 
+      {/* Admin Routes */}
       <Route
         path="/admin"
         element={
-          <ProtectedRoute requiredRole="admin">
+          <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
             <AppLayout currentPage="Dashboard">
               <AdminPageNew user={user} />
             </AppLayout>
@@ -97,7 +99,7 @@ function AppContent() {
       <Route
         path="/admin/users"
         element={
-          <ProtectedRoute requiredRole="admin">
+          <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
             <AppLayout currentPage="Users">
               <AdminUsersPage user={user} />
             </AppLayout>
@@ -108,7 +110,7 @@ function AppContent() {
       <Route
         path="/admin/print-jobs"
         element={
-          <ProtectedRoute requiredRole="admin">
+          <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
             <AppLayout currentPage="Print Jobs">
               <AdminPrintJobsPage user={user} />
             </AppLayout>
@@ -119,9 +121,21 @@ function AppContent() {
       <Route
         path="/admin/reports"
         element={
-          <ProtectedRoute requiredRole="admin">
+          <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
             <AppLayout currentPage="Reports">
               <AdminReportsPage user={user} />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Staff Routes */}
+      <Route
+        path="/staff"
+        element={
+          <ProtectedRoute allowedRoles={["staff", "admin", "superadmin"]}>
+            <AppLayout currentPage="Print Queue">
+              <StaffDashboard user={user} />
             </AppLayout>
           </ProtectedRoute>
         }

@@ -21,12 +21,40 @@ const authMiddleware = (req, res, next) => {
 };
 
 const isAdmin = (req, res, next) => {
-  if (req.user && req.user.role === "admin") {
+  if (req.user && (req.user.role === "admin" || req.user.role === "superadmin")) {
     next();
   } else {
     return res.status(403).json({ message: "Forbidden: Admin access required" });
   }
 };
 
+const isStaff = (req, res, next) => {
+  if (req.user && (req.user.role === "staff" || req.user.role === "admin" || req.user.role === "superadmin")) {
+    next();
+  } else {
+    return res.status(403).json({ message: "Forbidden: Staff access required" });
+  }
+};
+
+const isSuperAdmin = (req, res, next) => {
+  if (req.user && req.user.role === "superadmin") {
+    next();
+  } else {
+    return res.status(403).json({ message: "Forbidden: Super admin access required" });
+  }
+};
+
+const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return res.status(403).json({ message: "Forbidden: Access denied" });
+    }
+    next();
+  };
+};
+
 module.exports = authMiddleware;
 module.exports.isAdmin = isAdmin;
+module.exports.isStaff = isStaff;
+module.exports.isSuperAdmin = isSuperAdmin;
+module.exports.authorize = authorize;

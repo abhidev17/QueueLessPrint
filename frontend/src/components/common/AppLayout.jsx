@@ -14,7 +14,8 @@ export function AppLayout({ children, currentPage }) {
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role === "admin" || user?.role === "superadmin";
+  const isStaff = user?.role === "staff";
 
   const menuItems = isAdmin
     ? [
@@ -22,6 +23,11 @@ export function AppLayout({ children, currentPage }) {
         { label: "Users", icon: Users, href: "/admin/users" },
         { label: "Print Jobs", icon: FileText, href: "/admin/print-jobs" },
         { label: "Reports", icon: BarChart3, href: "/admin/reports" },
+      ]
+    : isStaff
+    ? [
+        { label: "Dashboard", icon: Home, href: "/staff" },
+        { label: "Print Queue", icon: FileText, href: "/staff" },
       ]
     : [
         { label: "Dashboard", icon: Home, href: "/dashboard" },
@@ -86,7 +92,13 @@ export function AppLayout({ children, currentPage }) {
                 {user?.name}
               </p>
               <p className={clsx("text-xs", isDark ? "text-slate-400" : "text-slate-600")}>
-                {user?.role === "admin" ? "Administrator" : "Student"}
+                {user?.role === "superadmin"
+                  ? "Super Admin"
+                  : user?.role === "admin"
+                  ? "Administrator"
+                  : user?.role === "staff"
+                  ? "Staff"
+                  : "Student"}
               </p>
             </div>
 

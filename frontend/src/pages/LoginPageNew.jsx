@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../api";
 import { Mail, Lock, User, Eye, EyeOff, Printer } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 
 function LoginPageNew({ setUser }) {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -57,6 +59,15 @@ function LoginPageNew({ setUser }) {
       resetLoginForm();
       
       toast.success("Login successful!");
+
+      // Role-based navigation
+      if (user.role === "superadmin" || user.role === "admin") {
+        navigate("/admin");
+      } else if (user.role === "staff") {
+        navigate("/staff");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
       console.error("Login error:", err);
       const errorMessage = err.response?.data?.message || "Login failed";
@@ -102,6 +113,9 @@ function LoginPageNew({ setUser }) {
       setUser(user);
       
       toast.success("Registration successful!");
+
+      // Navigate to dashboard for students (default role on registration)
+      navigate("/dashboard");
     } catch (err) {
       toast.error(err.response?.data?.message || "Registration failed");
     } finally {

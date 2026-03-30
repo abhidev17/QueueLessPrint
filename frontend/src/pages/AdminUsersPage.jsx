@@ -188,35 +188,53 @@ export default function AdminUsersPage({ user }) {
                   {u.email}
                 </td>
                 <td className="px-6 py-4">
-                  <select
-                    value={u.role}
-                    onChange={(e) => updateRole(u._id, e.target.value)}
-                    className={clsx(
-                      "px-3 py-1 rounded-lg text-sm font-semibold border-2 cursor-pointer transition-all",
-                      u.role === "admin"
-                        ? isDark
-                          ? "bg-blue-900 border-blue-700 text-blue-200"
-                          : "bg-blue-100 border-blue-300 text-blue-900"
-                        : isDark
-                        ? "bg-green-900 border-green-700 text-green-200"
-                        : "bg-green-100 border-green-300 text-green-900"
-                    )}
-                  >
-                    <option value="student">Student</option>
-                    <option value="admin">Admin</option>
-                  </select>
+                  {u.email === "admin@gmail.com" || u.role === "superadmin" ? (
+                    <span className={clsx(
+                      "px-3 py-1 rounded-full text-sm font-semibold",
+                      isDark
+                        ? "bg-purple-900 text-purple-200"
+                        : "bg-purple-100 text-purple-900"
+                    )}>
+                      SUPER ADMIN
+                    </span>
+                  ) : (
+                    <select
+                      value={u.role}
+                      onChange={(e) => updateRole(u._id, e.target.value)}
+                      className={clsx(
+                        "px-3 py-1 rounded-lg text-sm font-semibold border-2 cursor-pointer transition-all",
+                        u.role === "admin"
+                          ? isDark
+                            ? "bg-blue-900 border-blue-700 text-blue-200"
+                            : "bg-blue-100 border-blue-300 text-blue-900"
+                          : u.role === "staff"
+                          ? isDark
+                            ? "bg-orange-900 border-orange-700 text-orange-200"
+                            : "bg-orange-100 border-orange-300 text-orange-900"
+                          : isDark
+                          ? "bg-green-900 border-green-700 text-green-200"
+                          : "bg-green-100 border-green-300 text-green-900"
+                      )}
+                    >
+                      <option value="student">Student</option>
+                      <option value="staff">Staff</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  )}
                 </td>
                 <td className={clsx("px-6 py-4", isDark ? "text-slate-300" : "text-slate-600")}>
                   {new Date(u.createdAt).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4">
-                  <button
-                    onClick={() => deleteUser(u._id)}
-                    className="text-red-500 hover:text-red-700 transition-colors"
-                    title="Delete user"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  {u.email !== "admin@gmail.com" && u.role !== "superadmin" && (
+                    <button
+                      onClick={() => deleteUser(u._id)}
+                      className="text-red-500 hover:text-red-700 transition-colors"
+                      title="Delete user"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
