@@ -107,83 +107,111 @@ function StudentJobsNew({ user }) {
   return (
     <>
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-white to-amber-50 py-12 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-10 fade-in-up">
-            <h1 className="text-4xl font-bold text-slate-900 mb-2 flex items-center gap-2">
-              <FileText size={32} />
-              Your Print Jobs
-            </h1>
-            <p className="text-slate-600">Track the status of your submitted print jobs</p>
+      <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-white to-amber-50 pb-32">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white sticky top-0 z-10 shadow-lg">
+          <div className="max-w-md mx-auto px-4 py-6">
+            <h1 className="text-2xl font-bold flex items-center gap-2">📄 Your Jobs</h1>
+            <p className="text-cyan-100 text-sm">Track your print submissions</p>
           </div>
+        </div>
 
+        {/* Main Content */}
+        <div className="max-w-md mx-auto px-4 py-4 space-y-3">
           {jobs.length === 0 ? (
-            <div className="card text-center py-12 fade-in-up">
-              <FileText size={48} className="mx-auto mb-4 text-slate-400" />
-              <h3 className="text-xl font-semibold text-slate-700 mb-2">No Print Jobs Yet</h3>
-              <p className="text-slate-600">Start by submitting your first print job</p>
+            <div className="bg-white shadow-lg rounded-2xl p-8 text-center mt-8">
+              <FileText size={48} className="mx-auto mb-4 text-cyan-400" />
+              <h3 className="text-lg font-bold text-slate-900 mb-2">No Print Jobs</h3>
+              <p className="text-sm text-slate-600">Submit your first print job to see it here</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 stagger">
-              {jobs.map(job => (
-                <div key={job._id} className="card hover:shadow-lg hover:shadow-cyan-100 transition-shadow hover-lift">
-                  {/* Status Badge */}
-                  <div className="flex justify-between items-start mb-4">
-                    <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${getStatusColor(job.status)}`}>
-                      {getStatusIcon(job.status)}
-                      <span className="text-sm font-medium">{job.status}</span>
-                    </div>
-                    <span className="text-xs text-slate-500">
-                      {new Date(job.createdAt).toLocaleDateString()}
-                    </span>
+            <>
+              {/* Status Summary Cards */}
+              <div className="bg-white shadow-lg rounded-2xl p-4 space-y-2">
+                <h3 className="text-sm font-bold text-slate-900 mb-3">📊 Summary</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-yellow-50 rounded-lg p-3 text-center border border-yellow-200">
+                    <p className="text-2xl font-bold text-yellow-600">{jobs.filter(j => j.status === "pending").length}</p>
+                    <p className="text-xs text-yellow-700 font-medium">Pending</p>
                   </div>
-
-                  {/* Job Details */}
-                  <div className="space-y-3 mb-4">
-                    <div>
-                      <p className="text-xs text-slate-600 uppercase tracking-wide">File Name</p>
-                      <p className="font-medium text-slate-900 truncate">{job.fileName}</p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <p className="text-xs text-slate-600 uppercase tracking-wide">Copies</p>
-                        <p className="text-lg font-semibold text-cyan-700">{job.copies}x</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-slate-600 uppercase tracking-wide">Page Size</p>
-                        <p className="text-lg font-semibold text-cyan-700">{job.pageSize}</p>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <p className="text-xs text-slate-600 uppercase tracking-wide">Color</p>
-                        <p className="font-medium">{job.color ? "Yes" : "No"}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-slate-600 uppercase tracking-wide">Slot</p>
-                        <p className="font-medium flex items-center gap-1">
-                          <Clock size={16} />
-                          {job.slotTime}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <p className="text-xs text-slate-600 uppercase tracking-wide">Print Date</p>
-                      <p className="font-medium">{job.printDate}</p>
-                    </div>
+                  <div className="bg-blue-50 rounded-lg p-3 text-center border border-blue-200">
+                    <p className="text-2xl font-bold text-blue-600">{jobs.filter(j => j.status === "printing").length}</p>
+                    <p className="text-xs text-blue-700 font-medium">Printing</p>
                   </div>
-
-                  {/* Footer */}
-                  <div className="pt-4 border-t border-slate-100 text-xs text-slate-500">
-                    <p>ID: {job._id.slice(0, 8)}...</p>
+                  <div className="bg-green-50 rounded-lg p-3 text-center border border-green-200">
+                    <p className="text-2xl font-bold text-green-600">{jobs.filter(j => j.status === "completed").length}</p>
+                    <p className="text-xs text-green-700 font-medium">Completed</p>
+                  </div>
+                  <div className="bg-slate-50 rounded-lg p-3 text-center border border-slate-200">
+                    <p className="text-2xl font-bold text-slate-600">{jobs.length}</p>
+                    <p className="text-xs text-slate-700 font-medium">Total</p>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+
+              {/* Jobs List */}
+              <div className="space-y-3">
+                {jobs.map(job => (
+                  <div key={job._id} className="bg-white shadow-md rounded-xl p-4 border-l-4 border-cyan-500 hover:shadow-lg transition-shadow">
+                    {/* Header */}
+                    <div className="flex justify-between items-start mb-3">
+                      <div className={`flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusColor(job.status)}`}>
+                        {getStatusIcon(job.status)}
+                        <span>{job.status}</span>
+                      </div>
+                      <span className="text-xs text-slate-500">{new Date(job.createdAt).toLocaleDateString()}</span>
+                    </div>
+
+                    {/* File Info */}
+                    <p className="text-sm font-bold text-slate-900 truncate mb-2">{job.fileName}</p>
+
+                    {/* Details Grid */}
+                    <div className="grid grid-cols-2 gap-2 text-xs mb-3 pb-3 border-b border-slate-100">
+                      <div>
+                        <p className="text-slate-500 font-medium">Copies</p>
+                        <p className="font-bold text-slate-900">{job.copies}</p>
+                      </div>
+                      <div>
+                        <p className="text-slate-500 font-medium">Paper</p>
+                        <p className="font-bold text-slate-900">{job.pageSize}</p>
+                      </div>
+                      <div>
+                        <p className="text-slate-500 font-medium">Color</p>
+                        <p className="font-bold text-slate-900">{job.color ? "🌈 Yes" : "⚫ B&W"}</p>
+                      </div>
+                      <div>
+                        <p className="text-slate-500 font-medium">Priority</p>
+                        <p className="font-bold text-slate-900 capitalize">{job.priority || "Normal"}</p>
+                      </div>
+                    </div>
+
+                    {/* Slot Info */}
+                    <div className="text-xs">
+                      <p className="text-slate-500 font-medium">📅 {job.printDate} • ⏰ {job.slotTime}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
+        </div>
+
+        {/* Fixed Bottom Navigation */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-xl">
+          <div className="max-w-md mx-auto flex justify-around py-3 px-4">
+            <button className="flex flex-col items-center gap-1 text-slate-600 hover:text-cyan-600 transition-colors">
+              <span className="text-xl">🏠</span>
+              <span className="text-xs font-medium">Home</span>
+            </button>
+            <button className="flex flex-col items-center gap-1 text-cyan-600 bg-cyan-50 p-2 rounded-lg">
+              <span className="text-xl">📄</span>
+              <span className="text-xs font-medium">Jobs</span>
+            </button>
+            <button className="flex flex-col items-center gap-1 text-slate-600 hover:text-cyan-600 transition-colors">
+              <span className="text-xl">👤</span>
+              <span className="text-xs font-medium">Profile</span>
+            </button>
+          </div>
         </div>
       </div>
     </>

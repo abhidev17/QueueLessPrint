@@ -5,6 +5,7 @@ import socket from "../socket";
 import { AlertCircle, Loader2, RefreshCw, Printer } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import { PageWrapper } from "../components/PageWrapper";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 function AdminPageNew({ user }) {
   const [jobs, setJobs] = useState([]);
@@ -152,6 +153,59 @@ function AdminPageNew({ user }) {
               </motion.div>
             ))}
           </div>
+
+          {/* Analytics Dashboard */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.4 }}
+            className="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-cyan-100"
+          >
+            <h2 className="text-xl font-bold text-slate-900 mb-4">📊 Job Status Analytics</h2>
+            <div className="w-full h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={[
+                    { name: "Pending", value: stats.pending, fill: "#f59e0b" },
+                    { name: "Printing", value: stats.printing, fill: "#0ea5e9" },
+                    { name: "Completed", value: stats.completed, fill: "#10b981" }
+                  ]}
+                >
+                  <XAxis dataKey="name" stroke="#64748b" />
+                  <YAxis stroke="#64748b" />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: "8px" }}
+                    cursor={{ fill: "rgba(0,0,0,0.1)" }}
+                  />
+                  <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+                    {[
+                      { name: "Pending", fill: "#f59e0b" },
+                      { name: "Printing", fill: "#0ea5e9" },
+                      { name: "Completed", fill: "#10b981" }
+                    ].map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            
+            {/* Summary Stats */}
+            <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-slate-200">
+              <div className="text-center">
+                <p className="text-sm text-slate-600 font-medium">Avg Pending</p>
+                <p className="text-2xl font-bold text-amber-600">{stats.total > 0 ? ((stats.pending / stats.total) * 100).toFixed(0) : 0}%</p>
+              </div>
+              <div className="text-center">
+                <p className="text-sm text-slate-600 font-medium">Avg Printing</p>
+                <p className="text-2xl font-bold text-blue-600">{stats.total > 0 ? ((stats.printing / stats.total) * 100).toFixed(0) : 0}%</p>
+              </div>
+              <div className="text-center">
+                <p className="text-sm text-slate-600 font-medium">Completion Rate</p>
+                <p className="text-2xl font-bold text-green-600">{stats.total > 0 ? ((stats.completed / stats.total) * 100).toFixed(0) : 0}%</p>
+              </div>
+            </div>
+          </motion.div>
 
           {/* Filter Tabs */}
           <div className="flex gap-2 mb-6 flex-wrap">

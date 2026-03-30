@@ -13,12 +13,14 @@ function StudentPageNew({ user }) {
   const [slotTime, setSlotTime] = useState("10:00 AM");
   const [printDate, setPrintDate] = useState(new Date().toISOString().split("T")[0]);
   const [file, setFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
   const [slots, setSlots] = useState([]);
   const [loading, setLoading] = useState(false);
 
   // Reset print form to initial state
   const resetPrintForm = () => {
     setFile(null);
+    setPreviewUrl("");
     setCopies(1);
     setPageSize("A4");
     setColor(false);
@@ -29,6 +31,17 @@ function StudentPageNew({ user }) {
     // Reset file input value
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
+    }
+  };
+
+  // Handle file change with preview
+  const handleFileChange = (e) => {
+    const selected = e.target.files[0];
+    setFile(selected);
+
+    if (selected) {
+      const url = URL.createObjectURL(selected);
+      setPreviewUrl(url);
     }
   };
 
@@ -121,47 +134,83 @@ function StudentPageNew({ user }) {
   return (
     <>
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-white to-amber-50 py-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-10 fade-in-up">
-            <h1 className="text-4xl font-bold text-slate-900 mb-2">Submit Print Job</h1>
-            <p className="text-slate-600">Upload your document and choose your preferences</p>
+      <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-white to-amber-50 pb-32">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white sticky top-0 z-10 shadow-lg">
+          <div className="max-w-md mx-auto px-4 py-6">
+            <h1 className="text-2xl font-bold">🖨️ Print Job</h1>
+            <p className="text-cyan-100 text-sm">Upload and submit your document</p>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 stagger">
-            {/* Form */}
-            <div className="lg:col-span-2">
-              <div className="card hover-lift">
-                <form onSubmit={submitPrint} className="space-y-6">
-                  {/* File Upload */}
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-3">
-                      Upload Document
-                    </label>
-                    <div className="border-2 border-dashed border-cyan-300 rounded-xl p-8 text-center hover:border-cyan-500 bg-cyan-50/40 transition-colors">
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        onChange={(e) => setFile(e.target.files[0])}
-                        className="hidden"
-                        id="file-input"
-                        accept=".pdf,.doc,.docx,.txt,.jpg,.png"
-                      />
-                      <label htmlFor="file-input" className="cursor-pointer">
-                        <Upload className="mx-auto mb-3 text-cyan-700" size={32} />
-                        <p className="text-sm text-slate-600">
-                          {file ? (
-                            <>File: {file.name}</>
-                          ) : (
-                            <>Click to upload or drag and drop</>
-                          )}
-                        </p>
-                        <p className="text-xs text-slate-500">Supported: PDF, DOC, DOCX, TXT, Images</p>
-                      </label>
+        {/* Main Content */}
+        <div className="max-w-md mx-auto px-4 py-6 space-y-4">
+          {/* Form Card */}
+          <div className="bg-white shadow-lg rounded-2xl p-5 space-y-5">
+            <form onSubmit={submitPrint} className="space-y-5">
+              {/* File Upload */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  📄 Upload Document
+                </label>
+                <div className="border-2 border-dashed border-cyan-300 rounded-xl p-6 text-center hover:border-cyan-500 bg-cyan-50/40 transition-colors">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    id="file-input"
+                    accept=".pdf,.doc,.docx,.txt,.jpg,.png"
+                  />
+                  <label htmlFor="file-input" className="cursor-pointer">
+                    <Upload className="mx-auto mb-2 text-cyan-700" size={28} />
+                    <p className="text-sm text-slate-600">
+                      {file ? (
+                        <span className="text-green-600 font-semibold">✓ {file.name}</span>
+                      ) : (
+                        <>Tap to upload</>
+                      )}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">PDF, DOC, Images</p>
+                  </label>
+                </div>
+              </div>
+
+              {/* File Preview */}
+              {previewUrl && (
+                <div className="bg-gradient-to-br from-cyan-50 to-blue-50 border-2 border-cyan-200 rounded-xl p-3">
+                  <p className="text-xs font-semibold text-slate-700 mb-2">📋 Preview:</p>
+                  
+                  {/* PDF Preview */}
+                  {file.type === "application/pdf" && (
+                    <iframe
+                      src={previewUrl}
+                      className="w-full h-48 border border-cyan-300 rounded-lg"
+                      title="PDF Preview"
+                    />
+                  )}
+
+                  {/* Image Preview */}
+                  {file.type.startsWith("image/") && (
+                    <img
+                      src={previewUrl}
+                      alt="Document preview"
+                      className="w-full max-h-48 object-contain border border-cyan-300 rounded-lg"
+                    />
+                  )}
+
+                  {/* Other File Types */}
+                  {!file.type.startsWith("image/") && file.type !== "application/pdf" && (
+                    <div className="bg-white p-3 rounded-lg border border-cyan-300 text-center">
+                      <FileText className="mx-auto mb-1 text-cyan-600" size={24} />
+                      <p className="text-xs text-slate-600 font-medium">{file.name}</p>
+                      <p className="text-xs text-slate-500">Ready to print</p>
                     </div>
-                  </div>
+                  )}
+                </div>
+              )}
 
-                  {/* Date Selection */}
+              {/* Date Selection */}
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-3">
                       Print Date
@@ -261,57 +310,71 @@ function StudentPageNew({ user }) {
                     </select>
                   </div>
 
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    disabled={loading || !file}
-                    className="w-full btn-primary py-3 font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 size={20} className="animate-spin" />
-                        Submitting...
-                      </>
-                    ) : (
-                      <>
-                        <Upload size={20} />
-                        Submit Print Job
-                      </>
-                    )}
-                  </button>
-                </form>
-              </div>
-            </div>
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={loading || !file}
+                className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg transition-shadow"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Upload size={18} />
+                    Submit Print Job
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
 
-            {/* Slot Availability */}
-            <div>
-              <div className="card sticky top-24 hover-lift">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                  <Calendar size={20} />
-                  Availability
-                </h3>
-                <div className="space-y-3 stagger">
-                  {safeSlots.map(slot => {
-                    const isFull = slot.available === 0;
-                    return (
-                      <div
-                        key={slot.slot}
-                        className={`p-3 rounded-lg text-center ${
-                          isFull
-                            ? "bg-rose-50 border border-rose-200"
-                            : "bg-emerald-50 border border-emerald-200"
-                        }`}
-                      >
-                        <p className="font-semibold text-slate-900">{slot.slot}</p>
-                        <p className={`text-sm ${isFull ? "text-rose-700" : "text-emerald-700"}`}>
-                          {isFull ? "FULL" : `${slot.available} available`}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+          {/* Slot Availability Card */}
+          <div className="bg-white shadow-lg rounded-2xl p-5">
+            <h3 className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
+              <Calendar size={18} />
+              ⏰ Today's Slots
+            </h3>
+            <div className="space-y-2">
+              {safeSlots.map(slot => {
+                const isFull = slot.available === 0;
+                return (
+                  <div
+                    key={slot.slot}
+                    className={`p-3 rounded-lg text-center border-2 transition-colors ${
+                      isFull
+                        ? "bg-red-50 border-red-200"
+                        : "bg-green-50 border-green-200"
+                    }`}
+                  >
+                    <p className="font-semibold text-slate-900 text-sm">{slot.slot}</p>
+                    <p className={`text-xs font-semibold ${isFull ? "text-red-700" : "text-green-700"}`}>
+                      {isFull ? "🔴 FULL" : `🟢 ${slot.available} spots`}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
+          </div>
+        </div>
+
+        {/* Fixed Bottom Navigation */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-xl">
+          <div className="max-w-md mx-auto flex justify-around py-3 px-4">
+            <button className="flex flex-col items-center gap-1 text-slate-600 hover:text-cyan-600 transition-colors">
+              <span className="text-xl">🏠</span>
+              <span className="text-xs font-medium">Home</span>
+            </button>
+            <button className="flex flex-col items-center gap-1 text-cyan-600 bg-cyan-50 p-2 rounded-lg">
+              <span className="text-xl">📄</span>
+              <span className="text-xs font-medium">Jobs</span>
+            </button>
+            <button className="flex flex-col items-center gap-1 text-slate-600 hover:text-cyan-600 transition-colors">
+              <span className="text-xl">👤</span>
+              <span className="text-xs font-medium">Profile</span>
+            </button>
           </div>
         </div>
       </div>
