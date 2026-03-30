@@ -15,6 +15,22 @@ function LoginPageNew({ setUser }) {
   const [registerPassword, setRegisterPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // Helper function to reset login form
+  const resetLoginForm = () => {
+    setEmail("");
+    setPassword("");
+    setShowPassword(false);
+  };
+
+  // Helper function to reset register form
+  const resetRegisterForm = () => {
+    setName("");
+    setRegisterEmail("");
+    setRegisterPassword("");
+    setConfirmPassword("");
+    setShowPassword(false);
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) {
@@ -36,6 +52,9 @@ function LoginPageNew({ setUser }) {
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
       setUser(user);
+      
+      // Reset form after successful login
+      resetLoginForm();
       
       toast.success("Login successful!");
     } catch (err) {
@@ -76,6 +95,9 @@ function LoginPageNew({ setUser }) {
       
       const { token, user } = res.data;
       localStorage.setItem("token", token);
+      // Reset form after successful registration
+      resetRegisterForm();
+      
       localStorage.setItem("user", JSON.stringify(user));
       setUser(user);
       

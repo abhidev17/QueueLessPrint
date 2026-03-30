@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import API from "../api";
 import { Upload, Calendar, Copy, FileText, Loader2, AlertCircle } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 
 function StudentPageNew({ user }) {
+  const fileInputRef = useRef(null);
+  
   const [copies, setCopies] = useState(1);
   const [pageSize, setPageSize] = useState("A4");
   const [color, setColor] = useState(false);
@@ -12,6 +14,21 @@ function StudentPageNew({ user }) {
   const [file, setFile] = useState(null);
   const [slots, setSlots] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Reset print form to initial state
+  const resetPrintForm = () => {
+    setFile(null);
+    setCopies(1);
+    setPageSize("A4");
+    setColor(false);
+    setSlotTime("10:00 AM");
+    setPrintDate(new Date().toISOString().split("T")[0]);
+    
+    // Reset file input value
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   const safeSlots = Array.isArray(slots)
     ? slots.filter((slot) => slot && typeof slot === "object" && slot.slot)
@@ -67,10 +84,11 @@ function StudentPageNew({ user }) {
 
     if (!file) {
       toast.error("Please select a file to upload");
-      return;
-    }
-
-    const formData = new FormData();
+      
+      // Reset form after successful submission
+      resetPrintForm();
+      
+      // Reload slots after successful submissionew FormData();
     formData.append("copies", copies);
     formData.append("pageSize", pageSize);
     formData.append("color", color);
@@ -123,6 +141,7 @@ function StudentPageNew({ user }) {
                     </label>
                     <div className="border-2 border-dashed border-cyan-300 rounded-xl p-8 text-center hover:border-cyan-500 bg-cyan-50/40 transition-colors">
                       <input
+                        ref={fileInputRef}
                         type="file"
                         onChange={(e) => setFile(e.target.files[0])}
                         className="hidden"

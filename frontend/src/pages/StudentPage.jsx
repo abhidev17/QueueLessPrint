@@ -1,13 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import API from "../api";
 
 function StudentPage() {
 
+  const fileInputRef = useRef(null);
+  
   const [copies, setCopies] = useState(1);
   const [pageSize, setPageSize] = useState("A4");
   const [slotTime, setSlotTime] = useState("10:00 AM");
   const [file, setFile] = useState(null);
   const [slots, setSlots] = useState([]);
+
+  // Helper function to reset print form
+  const resetPrintForm = () => {
+    setFile(null);
+    setCopies(1);
+    setPageSize("A4");
+    setSlotTime("10:00 AM");
+    
+    // Reset file input value
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   useEffect(() => {
     loadSlots();
@@ -34,6 +49,9 @@ function StudentPage() {
     await API.post("/print/create", formData);
 
     alert("Print job submitted!");
+    
+    // Reset form after successful submission
+    resetPrintForm();
 
     loadSlots(); // refresh slot availability
   };
@@ -110,6 +128,7 @@ function StudentPage() {
         Document:
         <input
           type="file"
+          ref={fileInputRef}
           onChange={(e)=>setFile(e.target.files[0])}
         />
 

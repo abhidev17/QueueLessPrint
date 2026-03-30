@@ -6,26 +6,35 @@ function LoginPage({ setUser }) {
   const [email,setEmail] = useState("");
   const [password,setPassword] = useState("");
 
-const login = async (e) => {
+  // Helper function to reset login form
+  const resetLoginForm = () => {
+    setEmail("");
+    setPassword("");
+  };
 
-  e.preventDefault();
+  const login = async (e) => {
 
-  try{
+    e.preventDefault();
 
-    const res = await API.post("/users/login",{
-      email,
-      password
-    });
+    try{
 
-    setUser(res.data.user);
+      const res = await API.post("/users/login",{
+        email,
+        password
+      });
 
-  }catch(err){
+      setUser(res.data.user);
+      
+      // Reset form after successful login
+      resetLoginForm();
 
-    alert(err.response?.data?.message || "Login failed");
+    }catch(err){
 
-  }
+      alert(err.response?.data?.message || "Login failed");
 
-};
+    }
+
+  };
 if (res.data.user.role === "admin") {
  navigate("/admin");
 } else {
