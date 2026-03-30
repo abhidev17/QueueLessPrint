@@ -25,12 +25,32 @@ function StudentJobsNew({ user }) {
       }
     };
 
+    const handleJobCompleted = (data) => {
+      // Show notification if the completed job belongs to current user
+      if (data.userId === user?._id) {
+        toast.success(`✅ ${data.message}`, {
+          position: "top-right",
+          autoClose: 5000
+        });
+        // Update the job status in the list
+        setJobs((prevJobs) =>
+          prevJobs.map((job) => 
+            job.fileName === data.fileName 
+              ? { ...job, status: "completed" } 
+              : job
+          )
+        );
+      }
+    };
+
     socket.on("jobUpdated", handleJobUpdated);
     socket.on("new-print-job", handleNewJob);
+    socket.on("jobCompleted", handleJobCompleted);
 
     return () => {
       socket.off("jobUpdated", handleJobUpdated);
       socket.off("new-print-job", handleNewJob);
+      socket.off("jobCompleted", handleJobCompleted);
     };
   }, [user]);
 

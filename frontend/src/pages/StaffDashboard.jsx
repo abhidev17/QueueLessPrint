@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Printer, Clock, Zap, CheckCircle } from "lucide-react";
+import { Printer, Clock, Zap, CheckCircle, AlertCircle } from "lucide-react";
 import { toast } from "react-toastify";
 import API from "../api";
+import socket from "../socket";
 import { useTheme } from "../context/ThemeContext";
 import { PageWrapper } from "../components/PageWrapper";
 import clsx from "clsx";
@@ -15,6 +16,29 @@ export default function StaffDashboard({ user }) {
 
   useEffect(() => {
     loadJobs();
+
+    // Listen for job updates
+    const handleJobUpdated = (updatedJob) => {
+      setJobs((prevJobs) =>
+        prevJobs.map((job) => (job._id === updatedJob._id ? { ...job, ...updatedJob } : job))
+      );
+    };
+
+    // Listen for job completion notifications
+    const handleJobCompleted = (data) => {
+      toast.info(`✅ ${data.message}`, {
+        position: "top-right",
+        autoClose: 5000
+      });
+    };
+
+    socket.on("jobUpdated", handleJobUpdated);
+    socket.on("jobCompleted", handleJobCompleted);
+
+    return () => {
+      socket.off("jobUpdated", handleJobUpdated);
+      socket.off("jobCompleted", handleJobCompleted);
+    };
   }, []);
 
   const loadJobs = async () => {
@@ -44,7 +68,19 @@ export default function StaffDashboard({ user }) {
     }
   };
 
-  const filteredJobs = jobs.filter(job =>
+  // Sort by priority (high > normal > low) then filter
+  const sortByPriority = (jobsToSort) => {
+    const priorityOrder = { high: 0, normal: 1, low: 2 };
+    return [...jobsToSort].sort((a, b) => {
+      const priorityDiff = (priorityOrder[a.priority] || 1) - (priorityOrder[b.priority] || 1);
+      if (priorityDiff !== 0) return priorityDiff;
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+  };
+
+  const prioritySortedJobs = sortByPriority(jobs);
+  
+  const filteredJobs = prioritySortedJobs.filter(job =>
     filter === "all" ? true : job.status === filter
   );
 
@@ -255,6 +291,9 @@ export default function StaffDashboard({ user }) {
                 Color
               </th>
               <th className={clsx("px-6 py-3 text-left font-semibold", isDark ? "text-slate-200" : "text-slate-900")}>
+                Priority
+              </th>
+              <th className={clsx("px-6 py-3 text-left font-semibold", isDark ? "text-slate-200" : "text-slate-900")}>
                 Status
               </th>
               <th className={clsx("px-6 py-3 text-left font-semibold", isDark ? "text-slate-200" : "text-slate-900")}>
@@ -270,7 +309,14 @@ export default function StaffDashboard({ user }) {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, delay: idx * 0.05 }}
                 whileHover={{ backgroundColor: isDark ? "rgb(55, 65, 81)" : "rgb(248, 250, 252)" }}
-                className={isDark ? "hover:bg-slate-700" : "hover:bg-slate-50"}>
+                className={clsx(
+                  isDark ? "hover:bg-slate-700" : "hover:bg-slate-50",
+                  job.priority === "high"
+                    ? isDark
+                      ? "bg-red-900/20"
+                      : "bg-red-100/50"
+                    : ""
+                )}>
                 <td className={clsx("px-6 py-4 font-medium", isDark ? "text-white" : "text-slate-900")}>
                   {job.userId?.name || "Unknown"}
                 </td>
@@ -292,6 +338,25 @@ export default function StaffDashboard({ user }) {
                       : "bg-gray-100 text-gray-900"
                   )}>
                     {job.color ? "Color" : "B&W"}
+                  </span>
+                </td>
+                <td className="px-6 py-4">
+                  <span className={clsx(
+                    "px-3 py-1 rounded-full text-sm font-semibold capitalize flex items-center gap-1 w-fit",
+                    job.priority === "high"
+                      ? isDark
+                        ? "bg-red-900 text-red-200"
+                        : "bg-red-100 text-red-900"
+                      : job.priority === "low"
+                      ? isDark
+                        ? "bg-slate-700 text-slate-300"
+                        : "bg-slate-200 text-slate-700"
+                      : isDark
+                      ? "bg-blue-900 text-blue-200"
+                      : "bg-blue-100 text-blue-900"
+                  )}>
+                    {job.priority === "high" ? <AlertCircle size={14} /> : null}
+                    {job.priority || "normal"}
                   </span>
                 </td>
                 <td className="px-6 py-4">

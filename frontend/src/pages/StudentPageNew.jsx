@@ -9,6 +9,7 @@ function StudentPageNew({ user }) {
   const [copies, setCopies] = useState(1);
   const [pageSize, setPageSize] = useState("A4");
   const [color, setColor] = useState(false);
+  const [priority, setPriority] = useState("normal");
   const [slotTime, setSlotTime] = useState("10:00 AM");
   const [printDate, setPrintDate] = useState(new Date().toISOString().split("T")[0]);
   const [file, setFile] = useState(null);
@@ -21,6 +22,7 @@ function StudentPageNew({ user }) {
     setCopies(1);
     setPageSize("A4");
     setColor(false);
+    setPriority("normal");
     setSlotTime("10:00 AM");
     setPrintDate(new Date().toISOString().split("T")[0]);
     
@@ -93,6 +95,7 @@ function StudentPageNew({ user }) {
     formData.append("color", color);
     formData.append("printDate", printDate);
     formData.append("slotTime", slotTime);
+    formData.append("priority", priority);
     formData.append("document", file);
 
     setLoading(true);
@@ -219,6 +222,25 @@ function StudentPageNew({ user }) {
                     <label htmlFor="color" className="text-sm font-medium text-slate-700 cursor-pointer">
                       Color Printing (₹5 extra per page)
                     </label>
+                  </div>
+
+                  {/* Priority Selection */}
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-3">
+                      Priority (Optional)
+                    </label>
+                    <select
+                      value={priority}
+                      onChange={(e) => setPriority(e.target.value)}
+                      className="input-field"
+                    >
+                      <option value="low">Low</option>
+                      <option value="normal">Normal</option>
+                      <option value="high">High (Urgent)</option>
+                    </select>
+                    <p className="text-xs text-slate-500 mt-2">
+                      Higher priority jobs are processed first in the queue
+                    </p>
                   </div>
 
                   {/* Slot Selection */}

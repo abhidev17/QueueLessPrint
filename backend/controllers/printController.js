@@ -6,7 +6,7 @@ exports.createPrintJob = async (req, res) => {
       return res.status(400).json({ error: "File is required" });
     }
 
-    const { copies, pageSize, color, printDate, slotTime } = req.body;
+    const { copies, pageSize, color, printDate, slotTime, priority } = req.body;
     const userId = req.user?.userId; // Get from authenticated user
 
     if (!userId) {
@@ -37,7 +37,8 @@ exports.createPrintJob = async (req, res) => {
       pageSize,
       color: color === 'true' || color === true,
       printDate,
-      slotTime
+      slotTime,
+      priority: priority && ["low", "normal", "high"].includes(priority) ? priority : "normal"
     });
 
     await job.save();
@@ -61,8 +62,21 @@ exports.createPrintJob = async (req, res) => {
 
 exports.getAllPrintJobs = async (req, res) => {
   try {
-    const jobs = await PrintJob.find().populate("userId").sort({ createdAt: -1 });
-    res.json(jobs);
+    const jobs = await PrintJob.find().populate("userId").sort({ 
+      // Sort by priority first (high -> normal -> low), then by creation date
+      priority: 1,  // low (1) < normal (2) < high (3) - need to reverse in code
+      createdAt: -1 
+    });
+    
+    // Manually sort by priority with custom order (high > normal > low)
+    const priorityOrder = { high: 0, normal: 1, low: 2 };
+    const sortedJobs = jobs.sort((a, b) => {
+      const priorityDiff = (priorityOrder[a.priority] || 1) - (priorityOrder[b.priority] || 1);
+      if (priorityDiff !== 0) return priorityDiff;
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+    
+    res.json(sortedJobs);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
@@ -100,7 +114,18 @@ exports.updatePrintStatus = async (req, res) => {
 
     const io = req.app.get("io");
     if (io) {
+      // Emit update to all staff
       io.emit("jobUpdated", job);
+      
+      // Emit completion notification to the user when job is completed
+      if (status === "completed" && job.userId) {
+        io.emit("jobCompleted", {
+          userId: job.userId._id,
+          userName: job.userId.name,
+          fileName: job.fileName,
+          message: `Your print job "${job.fileName}" is ready for pickup!`
+        });
+      }
     }
 
     res.json({

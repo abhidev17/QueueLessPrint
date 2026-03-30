@@ -16,6 +16,11 @@ const printJobSchema = new mongoose.Schema({
     type: String,
     enum: ["pending", "printing", "completed"],
     default: "pending"
+  },
+  priority: {
+    type: String,
+    enum: ["low", "normal", "high"],
+    default: "normal"
   }
 }, { timestamps: true });
 
