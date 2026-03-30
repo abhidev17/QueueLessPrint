@@ -19,11 +19,21 @@ exports.registerUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     
+    // Force student role if not admin@gmail.com, and prevent creating other admins
+    let userRole = "student";
+    if (email === "admin@gmail.com") {
+      userRole = "admin";
+    } else if (role === "admin") {
+      return res.status(403).json({ message: "Admin role cannot be assigned" });
+    } else if (role && ["student", "staff"].includes(role)) {
+      userRole = role;
+    }
+    
     const user = new User({
       name,
       email,
       password: hashedPassword,
-      role: role || "student"
+      role: userRole
     });
 
     await user.save();
@@ -144,8 +154,9 @@ exports.updateUser = async (req, res) => {
       return res.status(403).json({ message: "Cannot modify super admin account" });
     }
 
-    if (!role || !["student", "admin", "staff"].includes(role)) {
-      return res.status(400).json({ message: "Invalid role. Must be 'student', 'staff', or 'admin'" });
+    // Only allow student or staff roles (no admin assignments)
+    if (!role || !["student", "staff"].includes(role)) {
+      return res.status(403).json({ message: "Only student or staff roles allowed" });
     }
 
     // Prevent changing your own role

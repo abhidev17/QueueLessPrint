@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import API from "../api";
 import socket from "../socket";
 import { AlertCircle, Loader2, RefreshCw, Printer } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
+import { PageWrapper } from "../components/PageWrapper";
 
 function AdminPageNew({ user }) {
   const [jobs, setJobs] = useState([]);
@@ -100,12 +102,17 @@ function AdminPageNew({ user }) {
   }
 
   return (
-    <>
+    <PageWrapper>
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-white to-amber-50 py-12 px-4">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 fade-in-up">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8"
+          >
             <div>
               <h1 className="text-4xl font-bold text-slate-900 mb-2 flex items-center gap-2">
                 <Printer size={32} />
@@ -113,27 +120,36 @@ function AdminPageNew({ user }) {
               </h1>
               <p className="text-slate-600">Manage and monitor all print jobs</p>
             </div>
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={loadJobs}
               className="btn-primary flex items-center gap-2"
             >
               <RefreshCw size={18} />
               Refresh
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 stagger">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {[
               { label: "Total Jobs", value: stats.total, color: "bg-cyan-100 text-cyan-700" },
               { label: "Pending", value: stats.pending, color: "bg-amber-100 text-amber-700" },
               { label: "Printing", value: stats.printing, color: "bg-sky-100 text-sky-700" },
               { label: "Completed", value: stats.completed, color: "bg-emerald-100 text-emerald-700" }
             ].map((stat, idx) => (
-              <div key={idx} className={`${stat.color} rounded-xl p-4 text-center border border-white/60 hover-lift`}>
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: idx * 0.1 }}
+                whileHover={{ scale: 1.05 }}
+                className={`${stat.color} rounded-xl p-4 text-center border border-white/60 cursor-pointer transition-shadow hover:shadow-lg`}
+              >
                 <p className="text-sm font-medium opacity-75">{stat.label}</p>
                 <p className="text-3xl font-bold">{stat.value}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
 
@@ -177,8 +193,15 @@ function AdminPageNew({ user }) {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
-                    {filteredJobs.map(job => (
-                      <tr key={job._id} className="hover:bg-cyan-50/50 transition-colors">
+                    {filteredJobs.map((job, idx) => (
+                      <motion.tr
+                        key={job._id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.05 }}
+                        whileHover={{ backgroundColor: "rgba(0, 188, 212, 0.1)" }}
+                        className="hover:bg-cyan-50/50 transition-colors"
+                      >
                         <td className="px-6 py-4 text-sm font-medium text-slate-900">
                           {job.userId?.name || "Unknown"}
                         </td>
@@ -196,27 +219,35 @@ function AdminPageNew({ user }) {
                           {job.slotTime}
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(job.status)}`}>
+                          <motion.span
+                            animate={{ scale: [1, 1.05, 1] }}
+                            transition={{ repeat: Infinity, duration: 2 }}
+                            className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(job.status)}`}
+                          >
                             {job.status}
-                          </span>
+                          </motion.span>
                         </td>
                         <td className="px-6 py-4 text-sm space-x-2">
                           {job.status !== "Completed" && (
-                            <button
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.95 }}
                               onClick={() => updateStatus(job._id, "Printing")}
                               className="px-3 py-1 bg-cyan-100 text-cyan-700 rounded hover:bg-cyan-200 transition-colors"
                             >
                               Print
-                            </button>
+                            </motion.button>
                           )}
-                          <button
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={() => updateStatus(job._id, "Completed")}
                             className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded hover:bg-emerald-200 transition-colors"
                           >
                             Done
-                          </button>
+                          </motion.button>
                         </td>
-                      </tr>
+                      </motion.tr>
                     ))}
                   </tbody>
                 </table>
@@ -225,9 +256,16 @@ function AdminPageNew({ user }) {
           )}
 
           {/* Mobile Cards */}
-          <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4 stagger">
-            {filteredJobs.map(job => (
-              <div key={job._id} className={`card border-2 hover-lift ${getStatusColor(job.status)}`}>
+          <div className="lg:hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {filteredJobs.map((job, idx) => (
+              <motion.div
+                key={job._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.05 }}
+                whileHover={{ scale: 1.02 }}
+                className={`card border-2 ${getStatusColor(job.status)}`}
+              >
                 <div className="mb-3">
                   <p className="text-xs text-slate-600 uppercase tracking-wide">Student</p>
                   <p className="font-semibold text-slate-900">{job.userId?.name || "Unknown"}</p>
@@ -251,26 +289,30 @@ function AdminPageNew({ user }) {
 
                 <div className="flex gap-2 pt-3 border-t border-slate-200">
                   {job.status !== "Completed" && (
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => updateStatus(job._id, "Printing")}
                       className="flex-1 px-2 py-1 bg-cyan-100 text-cyan-700 text-sm rounded hover:bg-cyan-200"
                     >
                       Print
-                    </button>
+                    </motion.button>
                   )}
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={() => updateStatus(job._id, "Completed")}
                     className="flex-1 px-2 py-1 bg-emerald-100 text-emerald-700 text-sm rounded hover:bg-emerald-200"
                   >
                     Done
-                  </button>
+                  </motion.button>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </div>
-    </>
+    </PageWrapper>
   );
 }
 

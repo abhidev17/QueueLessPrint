@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { Printer, Clock, Zap, CheckCircle } from "lucide-react";
 import { toast } from "react-toastify";
 import API from "../api";
 import { useTheme } from "../context/ThemeContext";
+import { PageWrapper } from "../components/PageWrapper";
 import clsx from "clsx";
 
 export default function StaffDashboard({ user }) {
@@ -67,30 +69,41 @@ export default function StaffDashboard({ user }) {
   }
 
   return (
-    <div className={clsx(
-      "space-y-6",
-      isDark ? "bg-slate-900" : "bg-gradient-to-br from-slate-50 to-slate-100"
-    )}>
-      {/* Header */}
-      <div>
-        <h1 className={clsx("text-3xl font-bold flex items-center gap-2", isDark ? "text-white" : "text-slate-900")}>
-          <Printer size={32} />
-          Print Queue Management
-        </h1>
-        <p className={isDark ? "text-slate-400" : "text-slate-600"}>
-          Manage and process print jobs
-        </p>
-      </div>
+    <PageWrapper>
+      <div className={clsx(
+        "space-y-6",
+        isDark ? "bg-slate-900" : "bg-gradient-to-br from-slate-50 to-slate-100"
+      )}>
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <h1 className={clsx("text-3xl font-bold flex items-center gap-2", isDark ? "text-white" : "text-slate-900")}>
+            <Printer size={32} />
+            Print Queue Management
+          </h1>
+          <p className={isDark ? "text-slate-400" : "text-slate-600"}>
+            Manage and process print jobs
+          </p>
+        </motion.div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {/* Total Jobs */}
-        <div className={clsx(
-          "rounded-lg p-6 border",
-          isDark
-            ? "bg-slate-800 border-slate-700"
-            : "bg-white border-slate-200"
-        )}>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* Total Jobs */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+            whileHover={{ scale: 1.05 }}
+            className={clsx(
+              "rounded-lg p-6 border",
+              isDark
+                ? "bg-slate-800 border-slate-700"
+                : "bg-white border-slate-200"
+            )}
+          >
           <div className="flex items-center justify-between">
             <div>
               <p className={clsx("text-sm font-medium opacity-75", isDark ? "text-slate-400" : "text-slate-600")}>
@@ -102,15 +115,20 @@ export default function StaffDashboard({ user }) {
             </div>
             <Printer className={isDark ? "text-blue-400" : "text-blue-600"} size={32} />
           </div>
-        </div>
+          </motion.div>
 
         {/* Pending */}
-        <div className={clsx(
-          "rounded-lg p-6 border",
-          isDark
-            ? "bg-slate-800 border-slate-700"
-            : "bg-white border-slate-200"
-        )}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.15 }}
+          whileHover={{ scale: 1.05 }}
+          className={clsx(
+            "rounded-lg p-6 border",
+            isDark
+              ? "bg-slate-800 border-slate-700"
+              : "bg-white border-slate-200"
+          )}>
           <div className="flex items-center justify-between">
             <div>
               <p className={clsx("text-sm font-medium opacity-75", isDark ? "text-slate-400" : "text-slate-600")}>
@@ -122,15 +140,20 @@ export default function StaffDashboard({ user }) {
             </div>
             <Clock className={isDark ? "text-yellow-400" : "text-yellow-600"} size={32} />
           </div>
-        </div>
+        </motion.div>
 
         {/* Printing */}
-        <div className={clsx(
-          "rounded-lg p-6 border",
-          isDark
-            ? "bg-slate-800 border-slate-700"
-            : "bg-white border-slate-200"
-        )}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          whileHover={{ scale: 1.05 }}
+          className={clsx(
+            "rounded-lg p-6 border",
+            isDark
+              ? "bg-slate-800 border-slate-700"
+              : "bg-white border-slate-200"
+          )}>
           <div className="flex items-center justify-between">
             <div>
               <p className={clsx("text-sm font-medium opacity-75", isDark ? "text-slate-400" : "text-slate-600")}>
@@ -142,15 +165,20 @@ export default function StaffDashboard({ user }) {
             </div>
             <Zap className={isDark ? "text-blue-400" : "text-blue-600"} size={32} />
           </div>
-        </div>
+        </motion.div>
 
         {/* Completed */}
-        <div className={clsx(
-          "rounded-lg p-6 border",
-          isDark
-            ? "bg-slate-800 border-slate-700"
-            : "bg-white border-slate-200"
-        )}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.25 }}
+          whileHover={{ scale: 1.05 }}
+          className={clsx(
+            "rounded-lg p-6 border",
+            isDark
+              ? "bg-slate-800 border-slate-700"
+              : "bg-white border-slate-200"
+          )}>
           <div className="flex items-center justify-between">
             <div>
               <p className={clsx("text-sm font-medium opacity-75", isDark ? "text-slate-400" : "text-slate-600")}>
@@ -162,19 +190,25 @@ export default function StaffDashboard({ user }) {
             </div>
             <CheckCircle className={isDark ? "text-green-400" : "text-green-600"} size={32} />
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Filter Buttons */}
-      <div className={clsx(
-        "rounded-lg p-6 border flex gap-2 flex-wrap",
-        isDark
-          ? "bg-slate-800 border-slate-700"
-          : "bg-white border-slate-200"
-      )}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.3 }}
+        className={clsx(
+          "rounded-lg p-6 border flex gap-2 flex-wrap",
+          isDark
+            ? "bg-slate-800 border-slate-700"
+            : "bg-white border-slate-200"
+        )}>
         {["all", "pending", "printing", "completed"].map(status => (
-          <button
+          <motion.button
             key={status}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => setFilter(status)}
             className={clsx(
               "px-4 py-2 rounded-lg font-semibold transition-all capitalize",
@@ -188,17 +222,21 @@ export default function StaffDashboard({ user }) {
             )}
           >
             {status}
-          </button>
+          </motion.button>
         ))}
-      </div>
+      </motion.div>
 
       {/* Jobs Table */}
-      <div className={clsx(
-        "rounded-lg overflow-hidden border",
-        isDark
-          ? "bg-slate-800 border-slate-700"
-          : "bg-white border-slate-200"
-      )}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.35 }}
+        className={clsx(
+          "rounded-lg overflow-hidden border",
+          isDark
+            ? "bg-slate-800 border-slate-700"
+            : "bg-white border-slate-200"
+        )}>
         <table className="w-full">
           <thead className={clsx(
             isDark ? "bg-slate-700" : "bg-slate-100"
@@ -225,8 +263,14 @@ export default function StaffDashboard({ user }) {
             </tr>
           </thead>
           <tbody className={clsx("divide-y", isDark ? "divide-slate-700" : "divide-slate-200")}>
-            {filteredJobs.map((job) => (
-              <tr key={job._id} className={isDark ? "hover:bg-slate-700" : "hover:bg-slate-50"}>
+            {filteredJobs.map((job, idx) => (
+              <motion.tr
+                key={job._id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: idx * 0.05 }}
+                whileHover={{ backgroundColor: isDark ? "rgb(55, 65, 81)" : "rgb(248, 250, 252)" }}
+                className={isDark ? "hover:bg-slate-700" : "hover:bg-slate-50"}>
                 <td className={clsx("px-6 py-4 font-medium", isDark ? "text-white" : "text-slate-900")}>
                   {job.userId?.name || "Unknown"}
                 </td>
@@ -270,7 +314,9 @@ export default function StaffDashboard({ user }) {
                 </td>
                 <td className="px-6 py-4 space-x-2">
                   {job.status === "pending" && (
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => updateStatus(job._id, "printing")}
                       className={clsx(
                         "px-3 py-1 rounded-lg text-sm font-semibold transition-all",
@@ -280,11 +326,13 @@ export default function StaffDashboard({ user }) {
                       )}
                     >
                       Start
-                    </button>
+                    </motion.button>
                   )}
 
                   {job.status === "printing" && (
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => updateStatus(job._id, "completed")}
                       className={clsx(
                         "px-3 py-1 rounded-lg text-sm font-semibold transition-all",
@@ -294,7 +342,7 @@ export default function StaffDashboard({ user }) {
                       )}
                     >
                       Complete
-                    </button>
+                    </motion.button>
                   )}
 
                   {job.status === "completed" && (
@@ -308,7 +356,7 @@ export default function StaffDashboard({ user }) {
                     </span>
                   )}
                 </td>
-              </tr>
+              </motion.tr>
             ))}
           </tbody>
         </table>
@@ -323,7 +371,8 @@ export default function StaffDashboard({ user }) {
             </p>
           </div>
         )}
+      </motion.div>
       </div>
-    </div>
+    </PageWrapper>
   );
 }
