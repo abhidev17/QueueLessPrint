@@ -145,3 +145,25 @@ exports.getSlots = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Delete a print job (admin only)
+exports.deletePrintJob = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ message: "Print job ID is required" });
+    }
+
+    const job = await PrintJob.findByIdAndDelete(id);
+
+    if (!job) {
+      return res.status(404).json({ message: "Print job not found" });
+    }
+
+    res.json({ message: "Print job deleted successfully", job });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};

@@ -77,3 +77,41 @@ exports.loginUser = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Get all users (admin only)
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select("-password").lean();
+    res.json(users);
+  } catch (error) {
+    console.error("Get users error:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Delete a user (admin only)
+exports.deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    // Prevent deleting yourself
+    if (req.user.userId === id) {
+      return res.status(400).json({ message: "Cannot delete your own account" });
+    }
+
+    const user = await User.findByIdAndDelete(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ message: "User deleted successfully", user });
+  } catch (error) {
+    console.error("Delete user error:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
