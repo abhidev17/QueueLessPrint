@@ -10,6 +10,7 @@ export default function AdminUsersPage({ user }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const currentUser = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     loadUsers();
@@ -197,6 +198,23 @@ export default function AdminUsersPage({ user }) {
                     )}>
                       SUPER ADMIN
                     </span>
+                  ) : u._id === currentUser?._id ? (
+                    <span className={clsx(
+                      "px-3 py-1 rounded-lg text-sm font-semibold capitalize",
+                      u.role === "admin"
+                        ? isDark
+                          ? "bg-blue-900 text-blue-200"
+                          : "bg-blue-100 text-blue-900"
+                        : u.role === "staff"
+                        ? isDark
+                          ? "bg-orange-900 text-orange-200"
+                          : "bg-orange-100 text-orange-900"
+                        : isDark
+                        ? "bg-green-900 text-green-200"
+                        : "bg-green-100 text-green-900"
+                    )}>
+                      {u.role} <span className="text-xs">(you)</span>
+                    </span>
                   ) : (
                     <select
                       value={u.role}
@@ -226,7 +244,7 @@ export default function AdminUsersPage({ user }) {
                   {new Date(u.createdAt).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4">
-                  {u.email !== "admin@gmail.com" && u.role !== "superadmin" && (
+                  {u.email !== "admin@gmail.com" && u.role !== "superadmin" && u._id !== currentUser?._id && (
                     <button
                       onClick={() => deleteUser(u._id)}
                       className="text-red-500 hover:text-red-700 transition-colors"
