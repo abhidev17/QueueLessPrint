@@ -1,29 +1,47 @@
 # QueueLess Print
 
-QueueLess Print is a full-stack print job management app with role-based access for students and admins, file upload support, and real-time updates.
+A full-stack print job management system with role-based access (students & admins), real-time updates via Socket.IO, and seamless file upload.
 
-## Current Deployment
+## 🚀 Live Demo
 
-- Frontend (Vercel): https://queue-less-print-plwk.vercel.app
-- Backend (Render): https://queuelessprint-backend.onrender.com
-- Backend root health message: QueueLessPrint API running at /
+- **Frontend**: https://queue-less-print-plwk.vercel.app
+- **Backend**: https://queuelessprint-backend.onrender.com
+
+### Demo Credentials
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `admin@print.com` | `admin123` |
+| Student | `student@print.com` | `student123` |
+
+## Features
+
+✨ **Core Features:**
+- 👤 User authentication (JWT + bcryptjs)
+- 📄 File upload with multer support
+- 🔄 Real-time updates (Socket.IO)
+- 👥 Role-based access (Admin & Student)
+- 📊 Print job management
+- 🎨 Modern UI with Tailwind CSS
+- 🔔 Toast notifications
 
 ## Tech Stack
 
 ### Backend
-- Node.js + Express
-- MongoDB + Mongoose
-- JWT auth
-- bcryptjs
-- multer
-- socket.io
+- **Node.js** + Express
+- **MongoDB** + Mongoose (Cloud: Atlas)
+- **Socket.IO** - Real-time updates
+- **JWT** + bcryptjs - Authentication
+- **Multer** - File uploads
+- **Deployed on**: Render
 
 ### Frontend
-- React 18 + Vite
-- Axios
-- Tailwind CSS
-- react-toastify
-- socket.io-client
+- **React 18** + Vite
+- **Tailwind CSS** - Styling
+- **Axios** - API calls
+- **Socket.IO Client** - Real-time events
+- **React Toastify** - Notifications
+- **Deployed on**: Vercel
 
 ## Repository Structure
 
@@ -31,23 +49,35 @@ QueueLess Print is a full-stack print job management app with role-based access 
 QueueLessPrint/
   backend/
     config/
+      multerConfig.js
     controllers/
+      printController.js
+      userController.js
     middleware/
+      authMiddleware.js
     models/
+      PrintJob.js
+      User.js
     routes/
+      printRoutes.js
+      userRoutes.js
     uploads/
     server.js
     package.json
   frontend/
     src/
-    .env
+      api.js
+      socket.js
+      components/
+      pages/
+      App.jsx
+      main.jsx
     package.json
+  .env (backend)
+  .env (frontend)
   README.md
   SETUP_GUIDE.md
-  IMPROVEMENTS.md
 ```
-
-## Local Setup
 
 ### 1) Prerequisites
 
@@ -151,19 +181,56 @@ Common endpoints:
 - Set VITE_API_URL in Vercel project environment variables.
 - Redeploy after env var changes.
 
-## CORS Status
+## CORS Configuration
 
-Current backend Express CORS is temporarily configured to allow all origins for troubleshooting:
+Backend CORS is configured with a whitelist of allowed origins:
 
 ```js
 app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "https://queue-less-print-plwk.vercel.app"
+  ],
+  credentials: true
 }));
 ```
 
-For stricter production security, replace origin: "*" with an allowlist of trusted frontend domains.
+## Demo Flow (Testing Guide)
+
+### Step 1: Clean Test
+Open the app in **Incognito Mode**: https://queue-less-print-plwk.vercel.app
+
+### Step 2: Register or Login
+Use demo credentials:
+- **Admin**: admin@print.com / admin123
+- **Student**: student@print.com / student123
+
+Or create a new student account.
+
+### Step 3: Submit a Print Job (Student)
+1. Click "Submit Print Job"
+2. Upload a PDF/document
+3. Select preferences (copies, size, color, date, slot)
+4. Click "Submit"
+5. See real-time update in dashboard
+
+### Step 4: Verify in MongoDB Atlas
+- Go to MongoDB Atlas → cluster0 → queuelessprint collection
+- Confirm new PrintJob document created
+- Check user email matches
+
+### Step 5: Admin Dashboard
+1. Login as admin
+2. View all print jobs
+3. Update job status (Pending → Printing → Completed)
+4. See real-time updates to students' dashboards
+
+### Step 6: Real-Time Updates
+- Socket.IO emits "new-print-job" when student submits
+- Admins receive notification instantly
+- Students see status changes in real-time
 
 ## Scripts
 

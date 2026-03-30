@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import API from "../api";
+import socket from "../socket";
 import { AlertCircle, Loader2, RefreshCw, Printer } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 
@@ -10,6 +11,25 @@ function AdminPageNew({ user }) {
 
   useEffect(() => {
     loadJobs();
+
+    const handleNewJob = (newJob) => {
+      setJobs((prevJobs) => [newJob, ...prevJobs]);
+      toast.info("New print job received!");
+    };
+
+    const handleJobUpdated = (updatedJob) => {
+      setJobs((prevJobs) =>
+        prevJobs.map((job) => (job._id === updatedJob._id ? { ...job, ...updatedJob } : job))
+      );
+    };
+
+    socket.on("new-print-job", handleNewJob);
+    socket.on("jobUpdated", handleJobUpdated);
+
+    return () => {
+      socket.off("new-print-job", handleNewJob);
+      socket.off("jobUpdated", handleJobUpdated);
+    };
   }, []);
 
   const loadJobs = async () => {

@@ -44,8 +44,9 @@ io.on("connection", (socket) => {
 });
 
 app.use(cors({
-  origin: "*",
+  origin: allowedOrigins,
   methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use(express.json());
@@ -92,16 +93,21 @@ const createAdmin = async () => {
   }
 };
 
-mongoose.connect(MONGODB_URI)
+mongoose.connect(MONGODB_URI, {
+  maxPoolSize: 10,
+  minPoolSize: 5,
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+})
   .then(() => {
     console.log("MongoDB Connected Successfully");
     createAdmin();
   })
-  .catch(err => console.log("MongoDB connection error:", err));
+  .catch(err => console.error("MongoDB connection error:", err));
 
 
 const PORT = process.env.PORT || 5000;
 
-server.listen(PORT, "0.0.0.0", () => {
+server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

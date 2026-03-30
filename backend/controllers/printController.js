@@ -42,6 +42,12 @@ exports.createPrintJob = async (req, res) => {
 
     await job.save();
 
+    // Emit real-time event to all connected clients
+    const io = req.app.get("io");
+    if (io) {
+      io.emit("new-print-job", job);
+    }
+
     res.json({
       message: "Print job created successfully",
       job

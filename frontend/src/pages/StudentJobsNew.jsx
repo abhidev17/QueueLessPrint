@@ -17,12 +17,22 @@ function StudentJobsNew({ user }) {
       );
     };
 
+    const handleNewJob = (newJob) => {
+      // Only add if it belongs to current user
+      if (newJob.userId === user?._id) {
+        setJobs((prevJobs) => [newJob, ...prevJobs]);
+        toast.info("New print job submitted!");
+      }
+    };
+
     socket.on("jobUpdated", handleJobUpdated);
+    socket.on("new-print-job", handleNewJob);
 
     return () => {
       socket.off("jobUpdated", handleJobUpdated);
+      socket.off("new-print-job", handleNewJob);
     };
-  }, []);
+  }, [user]);
 
   const loadJobs = async () => {
     try {
