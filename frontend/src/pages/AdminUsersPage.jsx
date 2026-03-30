@@ -42,6 +42,20 @@ export default function AdminUsersPage({ user }) {
     }
   };
 
+  const updateRole = async (userId, newRole) => {
+    try {
+      const res = await API.put(`/users/${userId}`, { role: newRole });
+      setUsers(users.map(u => (u._id === userId ? res.data.user : u)));
+      toast.success(`User role updated to ${newRole}`);
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || "Failed to update user role";
+      toast.error(errorMsg);
+      console.error(err);
+      // Reload users on failure to ensure consistency
+      loadUsers();
+    }
+  };
+
   const filteredUsers = users.filter(u =>
     u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     u.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -174,18 +188,23 @@ export default function AdminUsersPage({ user }) {
                   {u.email}
                 </td>
                 <td className="px-6 py-4">
-                  <span className={clsx(
-                    "px-3 py-1 rounded-full text-sm font-semibold",
-                    u.role === "admin"
-                      ? isDark
-                        ? "bg-blue-900 text-blue-200"
-                        : "bg-blue-100 text-blue-900"
-                      : isDark
-                      ? "bg-green-900 text-green-200"
-                      : "bg-green-100 text-green-900"
-                  )}>
-                    {u.role}
-                  </span>
+                  <select
+                    value={u.role}
+                    onChange={(e) => updateRole(u._id, e.target.value)}
+                    className={clsx(
+                      "px-3 py-1 rounded-lg text-sm font-semibold border-2 cursor-pointer transition-all",
+                      u.role === "admin"
+                        ? isDark
+                          ? "bg-blue-900 border-blue-700 text-blue-200"
+                          : "bg-blue-100 border-blue-300 text-blue-900"
+                        : isDark
+                        ? "bg-green-900 border-green-700 text-green-200"
+                        : "bg-green-100 border-green-300 text-green-900"
+                    )}
+                  >
+                    <option value="student">Student</option>
+                    <option value="admin">Admin</option>
+                  </select>
                 </td>
                 <td className={clsx("px-6 py-4", isDark ? "text-slate-300" : "text-slate-600")}>
                   {new Date(u.createdAt).toLocaleDateString()}

@@ -115,3 +115,39 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Update user role (admin only)
+exports.updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+
+    if (!role || !["student", "admin"].includes(role)) {
+      return res.status(400).json({ message: "Invalid role. Must be 'student' or 'admin'" });
+    }
+
+    // Prevent changing your own role
+    if (req.user.userId === id) {
+      return res.status(400).json({ message: "Cannot change your own role" });
+    }
+
+    const updated = await User.findByIdAndUpdate(
+      id,
+      { role },
+      { new: true }
+    ).select("-password");
+
+    if (!updated) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ message: "User role updated successfully", user: updated });
+  } catch (error) {
+    console.error("Update user error:", error);
+    res.status(500).json({ error: error.message });
+  }
+};
