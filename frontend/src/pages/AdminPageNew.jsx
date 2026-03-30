@@ -35,11 +35,19 @@ function AdminPageNew({ user }) {
   const loadJobs = async () => {
     try {
       setLoading(true);
+      console.log("Loading jobs with user:", user);
+      console.log("Token:", localStorage.getItem("token"));
       const res = await API.get("/print/all");
       setJobs(res.data || []);
     } catch (err) {
-      toast.error("Failed to load print jobs");
-      console.error(err);
+      const errorMsg = err.response?.data?.message || err.message || "Unknown error";
+      toast.error(`Failed to load jobs: ${errorMsg}`);
+      console.error("Load jobs error:", {
+        status: err.response?.status,
+        message: err.response?.data?.message,
+        data: err.response?.data,
+        error: err
+      });
     } finally {
       setLoading(false);
     }

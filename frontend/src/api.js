@@ -25,6 +25,15 @@ API.interceptors.request.use((config) => {
 API.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Log error details for debugging
+    console.error("API Error:", {
+      status: error.response?.status,
+      message: error.response?.data?.message,
+      url: error.config?.url,
+      method: error.config?.method,
+      fullError: error.response?.data
+    });
+
     if (error.response?.status === 401) {
       // Only clear and redirect if user is actually logged in
       const user = localStorage.getItem("user");
