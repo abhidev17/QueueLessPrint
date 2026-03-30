@@ -1,57 +1,112 @@
-import { useState, useEffect } from "react";
-import LoginPageNew from "./pages/LoginPageNew";
-import Sidebar from "./components/Sidebar";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { ThemeProvider } from "./context/ThemeContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import { AppLayout } from "./components/common/AppLayout";
+import AuthPage from "./pages/AuthPage";
+import Dashboard from "./pages/Dashboard";
 import StudentPageNew from "./pages/StudentPageNew";
 import StudentJobsNew from "./pages/StudentJobsNew";
 import AdminPageNew from "./pages/AdminPageNew";
-import Dashboard from "./pages/Dashboard";
 import ErrorBoundary from "./components/ErrorBoundary";
 import "react-toastify/dist/ReactToastify.css";
 
-function App() {
-  const [user, setUser] = useState(null);
-  const [page, setPage] = useState("dashboard");
+// Protected Route Wrapper
+function ProtectedRoute({ children, requiredRole = null }) {
+  const { user, loading } = useAuth();
 
-  useEffect(() => {
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (err) {
-        console.error("Failed to parse saved user", err);
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
-      }
-    }
-  }, []);
-
-  const handleLogin = (userData) => {
-    setUser(userData);
-    setPage("dashboard");
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    setUser(null);
-    setPage("dashboard");
-  };
+  if (loading) return <div>Loading...</div>;
 
   if (!user) {
-    return <LoginPageNew setUser={handleLogin} />;
+    return <Navigate to="/auth" replace />;
   }
 
+  if (requiredRole && user.role !== requiredRole) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+}
+
+function AppContent() {
+  const { user } = useAuth();
+
+  return (
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/auth" element={<AuthPage />} />
+
+      {/* Protected Routes */}
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <AppLayout currentPage="Dashboard">
+              <Dashboard user={user} />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <AppLayout currentPage="Dashboard">
+              <Dashboard user={user} />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/submit-job"
+        element={
+          <ProtectedRoute requiredRole="student">
+            <AppLayout currentPage="Submit Job">
+              <StudentPageNew user={user} />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/my-jobs"
+        element={
+          <ProtectedRoute requiredRole="student">
+            <AppLayout currentPage="My Jobs">
+              <StudentJobsNew user={user} />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <AppLayout currentPage="Dashboard">
+              <AdminPageNew user={user} />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Catch all */}
+      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+    </Routes>
+  );
+}
+
+function App() {
   return (
     <ErrorBoundary>
-      <div className="flex min-h-screen bg-gradient-to-br from-cyan-50 via-white to-amber-50">
-        <Sidebar page={page} setPage={setPage} user={user} onLogout={handleLogout} />
-        <main className="flex-1 overflow-auto p-4 md:p-8">
-          {page === "dashboard" && <Dashboard user={user} key="dashboard" />}
-          {page === "student" && <StudentPageNew user={user} key="student" />}
-          {page === "jobs" && <StudentJobsNew user={user} key="jobs" />}
-          {page === "admin" && <AdminPageNew user={user} key="admin" />}
-        </main>
-        </div>
+      <BrowserRouter>
+        <ThemeProvider>
+          <AuthProvider>
+            <AppContent />
+          </AuthProvider>
+        </ThemeProvider>
+      </BrowserRouter>
     </ErrorBoundary>
   );
 }
