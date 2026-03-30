@@ -84,11 +84,10 @@ function StudentPageNew({ user }) {
 
     if (!file) {
       toast.error("Please select a file to upload");
-      
-      // Reset form after successful submission
-      resetPrintForm();
-      
-      // Reload slots after successful submissionew FormData();
+      return;
+    }
+
+    const formData = new FormData();
     formData.append("copies", copies);
     formData.append("pageSize", pageSize);
     formData.append("color", color);
@@ -100,10 +99,7 @@ function StudentPageNew({ user }) {
     try {
       await API.post("/print/create", formData);
       toast.success("Print job submitted successfully!");
-      setFile(null);
-      setCopies(1);
-      setPageSize("A4");
-      setColor(false);
+      resetPrintForm();
       loadSlots();
     } catch (err) {
       console.error("Print submission error:", err);
