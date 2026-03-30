@@ -20,7 +20,7 @@ export function AppLayout({ children, currentPage }) {
     ? [
         { label: "Dashboard", icon: Home, href: "/admin" },
         { label: "Users", icon: Users, href: "/admin/users" },
-        { label: "Print Jobs", icon: FileText, href: "/admin/jobs" },
+        { label: "Print Jobs", icon: FileText, href: "/admin/print-jobs" },
         { label: "Reports", icon: BarChart3, href: "/admin/reports" },
       ]
     : [

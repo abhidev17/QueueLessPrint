@@ -7,6 +7,9 @@ import Dashboard from "./pages/Dashboard";
 import StudentPageNew from "./pages/StudentPageNew";
 import StudentJobsNew from "./pages/StudentJobsNew";
 import AdminPageNew from "./pages/AdminPageNew";
+import AdminUsersPage from "./pages/AdminUsersPage";
+import AdminPrintJobsPage from "./pages/AdminPrintJobsPage";
+import AdminReportsPage from "./pages/AdminReportsPage";
 import ErrorBoundary from "./components/ErrorBoundary";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -86,6 +89,39 @@ function AppContent() {
           <ProtectedRoute requiredRole="admin">
             <AppLayout currentPage="Dashboard">
               <AdminPageNew user={user} />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/users"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <AppLayout currentPage="Users">
+              <AdminUsersPage user={user} />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/print-jobs"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <AppLayout currentPage="Print Jobs">
+              <AdminPrintJobsPage user={user} />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/reports"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <AppLayout currentPage="Reports">
+              <AdminReportsPage user={user} />
             </AppLayout>
           </ProtectedRoute>
         }
