@@ -6,6 +6,7 @@ import API from "../api";
 import useSocket from "../hooks/useSocket";
 import { useTheme } from "../context/ThemeContext";
 import { PageWrapper } from "../components/PageWrapper";
+import { Link } from "react-router-dom";
 import clsx from "clsx";
 
 export default function StaffDashboard() {
@@ -104,12 +105,22 @@ export default function StaffDashboard() {
   return (
     <PageWrapper>
       <div className={clsx("space-y-6", isDark ? "bg-slate-900" : "bg-gradient-to-br from-slate-50 to-slate-100")}>
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className={clsx("text-3xl font-bold flex items-center gap-2", isDark ? "text-white" : "text-slate-900")}>
-            <Printer size={30} />
-            Print Queue Management
-          </h1>
-          <p className={isDark ? "text-slate-400" : "text-slate-600"}>Manage and process print jobs</p>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className={clsx("rounded-2xl border p-6", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200")}>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className={clsx("text-3xl font-bold flex items-center gap-2", isDark ? "text-white" : "text-slate-900")}>
+                <Printer size={30} />
+                Staff Dashboard
+              </h1>
+              <p className={isDark ? "text-slate-400" : "text-slate-600"}>Overview of queue health and high-priority jobs</p>
+            </div>
+            <Link
+              to="/staff/jobs"
+              className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition font-medium"
+            >
+              Open Print Jobs
+            </Link>
+          </div>
         </motion.div>
 
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
@@ -161,11 +172,18 @@ export default function StaffDashboard() {
             No {filter !== "all" ? filter : ""} jobs found
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filteredJobs.map((job) => (
-              <div key={job._id} className={clsx("aspect-square rounded-xl border p-4", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200")}>
-                <div className="h-full flex flex-col">
-                  <div className="flex items-start justify-between gap-2 mb-3">
+          <div className={clsx("rounded-xl border overflow-hidden", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200")}>
+            <div className={clsx("px-4 py-3 border-b", isDark ? "border-slate-700" : "border-slate-200")}>
+              <h2 className={clsx("font-semibold", isDark ? "text-white" : "text-slate-900")}>Active Queue</h2>
+            </div>
+            <div className="divide-y divide-slate-200/30">
+              {filteredJobs.map((job) => (
+                <div key={job._id} className="p-4 flex flex-col lg:flex-row lg:items-center gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className={clsx("font-semibold truncate", isDark ? "text-white" : "text-slate-900")}>{job.fileName}</p>
+                    <p className={clsx("text-sm", isDark ? "text-slate-400" : "text-slate-600")}>{job.userId?.name || "Unknown"} • {job.copies} copy • {job.pageSize}</p>
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span
                       className={clsx(
                         "px-2.5 py-1 rounded-full text-xs font-semibold capitalize",
@@ -180,26 +198,6 @@ export default function StaffDashboard() {
                     >
                       {job.status}
                     </span>
-                    <span className={clsx("text-xs", isDark ? "text-slate-400" : "text-slate-500")}>
-                      {new Date(job.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-
-                  <p className={clsx("text-sm font-semibold line-clamp-2", isDark ? "text-white" : "text-slate-900")}>{job.fileName}</p>
-                  <p className={clsx("text-xs mt-1", isDark ? "text-slate-400" : "text-slate-600")}>{job.userId?.name || "Unknown"}</p>
-
-                  <div className="grid grid-cols-2 gap-2 text-xs mt-3">
-                    <div>
-                      <p className={isDark ? "text-slate-500" : "text-slate-500"}>Copies</p>
-                      <p className={clsx("font-medium", isDark ? "text-slate-200" : "text-slate-800")}>{job.copies}</p>
-                    </div>
-                    <div>
-                      <p className={isDark ? "text-slate-500" : "text-slate-500"}>Paper</p>
-                      <p className={clsx("font-medium", isDark ? "text-slate-200" : "text-slate-800")}>{job.pageSize}</p>
-                    </div>
-                  </div>
-
-                  <div className="mt-auto pt-3 border-t border-slate-200/40 flex flex-wrap gap-2">
                     {normalize(job.status) === "pending" && (
                       <button onClick={() => updateStatus(job._id, "printing")} className="px-3 py-1.5 text-xs rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">Start</button>
                     )}
@@ -211,8 +209,8 @@ export default function StaffDashboard() {
                     )}
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
       </div>

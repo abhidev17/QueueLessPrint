@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Printer, Clock, Zap, CheckCircle2, AlertCircle } from "lucide-react";
+import { Printer, Clock, Zap, CheckCircle2, AlertCircle, Play, XCircle } from "lucide-react";
 import { toast } from "react-toastify";
 import API from "../api";
 import useSocket from "../hooks/useSocket";
 import { useTheme } from "../context/ThemeContext";
 import { PageWrapper } from "../components/PageWrapper";
-import { StatusBadge, FilterBar, EmptyState, LoadingSpinner } from "../components/ui";
+import { FilterBar, EmptyState, LoadingSpinner } from "../components/ui";
 import clsx from "clsx";
 
 export default function StaffJobs() {
@@ -98,6 +98,21 @@ export default function StaffJobs() {
     { value: "failed", label: "Failed" },
   ];
 
+  const getStatusClasses = (status) => {
+    switch (normalize(status)) {
+      case "pending":
+        return "bg-amber-100 text-amber-900";
+      case "printing":
+        return "bg-blue-100 text-blue-900";
+      case "completed":
+        return "bg-emerald-100 text-emerald-900";
+      case "failed":
+        return "bg-red-100 text-red-900";
+      default:
+        return "bg-slate-100 text-slate-900";
+    }
+  };
+
   return (
     <PageWrapper>
       <div className="space-y-6">
@@ -148,36 +163,59 @@ export default function StaffJobs() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredJobs.map((job) => (
-              <div key={job._id} className={clsx("aspect-square rounded-xl border p-4", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200") }>
+              <div
+                key={job._id}
+                className={clsx(
+                  "aspect-square rounded-xl border p-4 shadow-sm hover:shadow-md transition-all",
+                  isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"
+                )}
+              >
                 <div className="h-full flex flex-col">
                   <div className="flex items-start justify-between gap-2 mb-3">
-                    <StatusBadge status={job.status} size="sm" />
+                    <span className={clsx("px-2.5 py-1 rounded-full text-xs font-semibold capitalize", getStatusClasses(job.status))}>
+                      {job.status}
+                    </span>
                     <span className={clsx("text-xs", isDark ? "text-slate-400" : "text-slate-500")}>{new Date(job.createdAt).toLocaleDateString()}</span>
                   </div>
 
-                  <p className={clsx("text-sm font-semibold line-clamp-2", isDark ? "text-white" : "text-slate-900")}>{job.fileName}</p>
-                  <p className={clsx("text-xs mt-1", isDark ? "text-slate-400" : "text-slate-600")}>{job.userId?.name}</p>
+                  <p className={clsx("text-sm font-bold line-clamp-2 mb-2", isDark ? "text-white" : "text-slate-900")}>{job.fileName}</p>
+                  <p className={clsx("text-xs mb-3", isDark ? "text-slate-400" : "text-slate-600")}>{job.userId?.name || "Unknown"}</p>
 
-                  <div className="grid grid-cols-2 gap-2 text-xs mt-3">
+                  <div className="grid grid-cols-2 gap-2 text-xs mb-3">
                     <div>
                       <p className={isDark ? "text-slate-500" : "text-slate-500"}>Copies</p>
-                      <p className={clsx("font-medium", isDark ? "text-slate-200" : "text-slate-800")}>{job.copies}</p>
+                      <p className={clsx("font-semibold", isDark ? "text-slate-200" : "text-slate-800")}>{job.copies}</p>
                     </div>
                     <div>
                       <p className={isDark ? "text-slate-500" : "text-slate-500"}>Paper</p>
-                      <p className={clsx("font-medium", isDark ? "text-slate-200" : "text-slate-800")}>{job.pageSize}</p>
+                      <p className={clsx("font-semibold", isDark ? "text-slate-200" : "text-slate-800")}>{job.pageSize}</p>
                     </div>
                   </div>
 
                   <div className="mt-auto pt-3 border-t border-slate-200/40 flex flex-wrap gap-2">
                     {normalize(job.status) === "pending" && (
-                      <button onClick={() => updateJobStatus(job._id, "printing")} className="btn-primary text-xs px-3 py-1.5">Start</button>
+                      <button
+                        onClick={() => updateJobStatus(job._id, "printing")}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+                      >
+                        <Play size={12} /> Start
+                      </button>
                     )}
                     {normalize(job.status) === "printing" && (
-                      <button onClick={() => updateJobStatus(job._id, "completed")} className="px-3 py-1.5 text-xs rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition">Complete</button>
+                      <button
+                        onClick={() => updateJobStatus(job._id, "completed")}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition"
+                      >
+                        <CheckCircle2 size={12} /> Complete
+                      </button>
                     )}
                     {normalize(job.status) !== "completed" && normalize(job.status) !== "failed" && (
-                      <button onClick={() => updateJobStatus(job._id, "failed")} className="px-3 py-1.5 text-xs rounded-lg bg-red-600 text-white hover:bg-red-700 transition">Fail</button>
+                      <button
+                        onClick={() => updateJobStatus(job._id, "failed")}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
+                      >
+                        <XCircle size={12} /> Fail
+                      </button>
                     )}
                   </div>
                 </div>
