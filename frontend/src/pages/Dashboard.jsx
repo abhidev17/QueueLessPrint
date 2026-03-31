@@ -38,6 +38,7 @@ function Dashboard({ user }) {
 
   const { isDark } = useTheme();
   const isAdmin = user?.role === "admin";
+  const isStudent = user?.role === "student";
 
   // Status normalization
   const normalize = (s) => s?.toLowerCase() || "";
@@ -150,7 +151,11 @@ function Dashboard({ user }) {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={clsx(isStudent && "text-center")}
+      >
         <h1 className={clsx("text-3xl font-bold", isDark ? "text-white" : "text-slate-900")}>
           Welcome back, {user?.name}!
         </h1>
