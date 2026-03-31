@@ -25,6 +25,13 @@ import "react-toastify/dist/ReactToastify.css";
 function ProtectedRoute({ children, allowedRoles = null }) {
   const { user, loading } = useAuth();
 
+  const getRoleHomePath = (currentUser) => {
+    if (!currentUser) return "/auth";
+    if (currentUser.role === "admin" || currentUser.role === "superadmin") return "/admin";
+    if (currentUser.role === "staff") return "/staff";
+    return "/dashboard";
+  };
+
   if (loading) return <div>Loading...</div>;
 
   if (!user) {
@@ -32,7 +39,7 @@ function ProtectedRoute({ children, allowedRoles = null }) {
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={getRoleHomePath(user)} replace />;
   }
 
   return children;

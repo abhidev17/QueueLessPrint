@@ -5,7 +5,7 @@ import clsx from "clsx";
 
 export default function AdminSettings() {
   const { user } = useAuth();
-  const { isDark, setIsDark } = useTheme();
+  const { isDark, toggleTheme } = useTheme();
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
@@ -68,7 +68,7 @@ export default function AdminSettings() {
         <div className="flex items-center justify-between">
           <label className={clsx("text-sm font-medium", isDark ? "text-slate-300" : "text-slate-700")}>Dark Mode</label>
           <button
-            onClick={() => setIsDark(!isDark)}
+            onClick={toggleTheme}
             className={clsx("w-12 h-6 rounded-full transition-colors flex items-center", isDark ? "bg-blue-600" : "bg-slate-300")}
           >
             <div className={clsx("w-5 h-5 bg-white rounded-full transition-transform", isDark ? "translate-x-6" : "translate-x-0.5")} />
