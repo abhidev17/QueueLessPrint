@@ -10,9 +10,11 @@ export function StaffLayout() {
       </div>
 
       {/* Main Content with Offset */}
-      <div className="ml-72 w-full overflow-y-auto h-screen">
-        <Outlet />
-      </div>
+      <main className="ml-72 w-full overflow-y-auto h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <Outlet />
+        </div>
+      </main>
     </div>
   );
 }
