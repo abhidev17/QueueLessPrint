@@ -69,12 +69,14 @@ function StudentJobsNew({ user }) {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "Completed":
+      case "completed":
         return "bg-emerald-100 text-emerald-800";
-      case "Printing":
+      case "printing":
         return "bg-cyan-100 text-cyan-800";
-      case "Pending":
+      case "pending":
         return "bg-amber-100 text-amber-800";
+      case "failed":
+        return "bg-red-100 text-red-800";
       default:
         return "bg-slate-100 text-slate-800";
     }
@@ -82,12 +84,14 @@ function StudentJobsNew({ user }) {
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case "Completed":
+      case "completed":
         return <CheckCircle size={20} />;
-      case "Printing":
+      case "printing":
         return <Loader2 size={20} className="animate-spin" />;
-      case "Pending":
+      case "pending":
         return <AlertCircle size={20} />;
+      case "failed":
+        return <AlertCircle size={20} className="text-red-500" />;
       default:
         return null;
     }
@@ -130,22 +134,35 @@ function StudentJobsNew({ user }) {
               <div className="bg-white shadow-lg rounded-2xl p-4 space-y-2">
                 <h3 className="text-sm font-bold text-slate-900 mb-3">📊 Summary</h3>
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-yellow-50 rounded-lg p-3 text-center border border-yellow-200">
-                    <p className="text-2xl font-bold text-yellow-600">{jobs.filter(j => j.status === "pending").length}</p>
-                    <p className="text-xs text-yellow-700 font-medium">Pending</p>
-                  </div>
-                  <div className="bg-blue-50 rounded-lg p-3 text-center border border-blue-200">
-                    <p className="text-2xl font-bold text-blue-600">{jobs.filter(j => j.status === "printing").length}</p>
-                    <p className="text-xs text-blue-700 font-medium">Printing</p>
-                  </div>
-                  <div className="bg-green-50 rounded-lg p-3 text-center border border-green-200">
-                    <p className="text-2xl font-bold text-green-600">{jobs.filter(j => j.status === "completed").length}</p>
-                    <p className="text-xs text-green-700 font-medium">Completed</p>
-                  </div>
-                  <div className="bg-slate-50 rounded-lg p-3 text-center border border-slate-200">
-                    <p className="text-2xl font-bold text-slate-600">{jobs.length}</p>
-                    <p className="text-xs text-slate-700 font-medium">Total</p>
-                  </div>
+                  {(() => {
+                    const pending = jobs.filter(j => j.status === "pending").length;
+                    const printing = jobs.filter(j => j.status === "printing").length;
+                    const completed = jobs.filter(j => j.status === "completed").length;
+                    const failed = jobs.filter(j => j.status === "failed").length;
+                    const total = jobs.length;
+                    const completedPercent = total > 0 ? ((completed / total) * 100).toFixed(0) : 0;
+
+                    return (
+                      <>
+                        <div className="bg-yellow-50 rounded-lg p-3 text-center border border-yellow-200">
+                          <p className="text-2xl font-bold text-yellow-600">{pending}</p>
+                          <p className="text-xs text-yellow-700 font-medium">Pending</p>
+                        </div>
+                        <div className="bg-blue-50 rounded-lg p-3 text-center border border-blue-200">
+                          <p className="text-2xl font-bold text-blue-600">{printing}</p>
+                          <p className="text-xs text-blue-700 font-medium">Printing</p>
+                        </div>
+                        <div className="bg-green-50 rounded-lg p-3 text-center border border-green-200">
+                          <p className="text-2xl font-bold text-green-600">{completed}</p>
+                          <p className="text-xs text-green-700 font-medium">Completed ({completedPercent}%)</p>
+                        </div>
+                        <div className="bg-red-50 rounded-lg p-3 text-center border border-red-200">
+                          <p className="text-2xl font-bold text-red-600">{failed}</p>
+                          <p className="text-xs text-red-700 font-medium">Failed</p>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
               </div>
 

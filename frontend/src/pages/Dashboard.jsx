@@ -71,9 +71,10 @@ function Dashboard({ user }) {
   const calculateStats = (jobsList) => {
     const newStats = {
       total: jobsList.length,
-      pending: jobsList.filter((j) => j?.status === "Pending").length,
-      printing: jobsList.filter((j) => j?.status === "Printing").length,
-      completed: jobsList.filter((j) => j?.status === "Completed").length,
+      pending: jobsList.filter((j) => j?.status === "pending").length,
+      printing: jobsList.filter((j) => j?.status === "printing").length,
+      completed: jobsList.filter((j) => j?.status === "completed").length,
+      failed: jobsList.filter((j) => j?.status === "failed").length,
     };
     setStats(newStats);
   };
@@ -85,9 +86,11 @@ function Dashboard({ user }) {
         month: "short",
         day: "numeric",
       });
-      if (!grouped[date]) grouped[date] = { date, jobs: 0, completed: 0 };
-      grouped[date].jobs++;
-      if (job.status === "Completed") grouped[date].completed++;
+      if (!grouped[date]) grouped[date] = { date, pending: 0, printing: 0, completed: 0, failed: 0 };
+      if (job.status === "pending") grouped[date].pending++;
+      if (job.status === "printing") grouped[date].printing++;
+      if (job.status === "completed") grouped[date].completed++;
+      if (job.status === "failed") grouped[date].failed++;
     });
 
     setChartData(Object.values(grouped).slice(-7));
@@ -109,12 +112,14 @@ function Dashboard({ user }) {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "Completed":
+      case "completed":
         return "success";
-      case "Printing":
+      case "printing":
         return "info";
-      case "Pending":
+      case "pending":
         return "warning";
+      case "failed":
+        return "error";
       default:
         return "default";
     }
@@ -125,6 +130,7 @@ function Dashboard({ user }) {
     { label: "Pending", value: stats.pending, icon: Clock, color: "yellow" },
     { label: "Printing", value: stats.printing, icon: Zap, color: "purple" },
     { label: "Completed", value: stats.completed, icon: CheckCircle, color: "green" },
+    { label: "Failed", value: stats.failed || 0, icon: AlertCircle, color: "red" },
   ];
 
   const chartColors = isDark
@@ -234,19 +240,35 @@ function Dashboard({ user }) {
                   <Legend />
                   <Line
                     type="monotone"
-                    dataKey="jobs"
-                    stroke={chartColors.line}
+                    dataKey="pending"
+                    stroke="#facc15"
                     strokeWidth={2}
-                    dot={{ fill: chartColors.line, r: 4 }}
-                    name="Total Jobs"
+                    dot={{ fill: "#facc15", r: 4 }}
+                    name="Pending"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="printing"
+                    stroke="#3b82f6"
+                    strokeWidth={2}
+                    dot={{ fill: "#3b82f6", r: 4 }}
+                    name="Printing"
                   />
                   <Line
                     type="monotone"
                     dataKey="completed"
-                    stroke={chartColors.bar}
+                    stroke="#22c55e"
                     strokeWidth={2}
-                    dot={{ fill: chartColors.bar, r: 4 }}
+                    dot={{ fill: "#22c55e", r: 4 }}
                     name="Completed"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="failed"
+                    stroke="#ef4444"
+                    strokeWidth={2}
+                    dot={{ fill: "#ef4444", r: 4 }}
+                    name="Failed"
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -274,6 +296,7 @@ function Dashboard({ user }) {
                       { name: "Pending", value: stats.pending },
                       { name: "Printing", value: stats.printing },
                       { name: "Completed", value: stats.completed },
+                      { name: "Failed", value: stats.failed || 0 },
                     ]}
                     cx="50%"
                     cy="50%"
@@ -284,8 +307,9 @@ function Dashboard({ user }) {
                     dataKey="value"
                   >
                     <Cell fill="#fbbf24" />
-                    <Cell fill="#a78bfa" />
+                    <Cell fill="#3b82f6" />
                     <Cell fill="#34d399" />
+                    <Cell fill="#ef4444" />
                   </Pie>
                   <Tooltip
                     contentStyle={{
