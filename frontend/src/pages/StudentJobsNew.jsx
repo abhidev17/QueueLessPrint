@@ -61,7 +61,10 @@ function StudentJobsNew({ user }) {
     try {
       setLoading(true);
       const res = await API.get("/print/user-jobs");
-      setJobs(res.data || []);
+      
+      // ✅ EXTRA SAFETY: Filter valid jobs
+      const validJobs = (res.data || []).filter(job => job && job._id);
+      setJobs(validJobs);
     } catch (err) {
       toast.error("Failed to load your jobs");
       console.error(err);

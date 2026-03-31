@@ -65,8 +65,12 @@ export default function StaffDashboard({ user }) {
       }); // Debug
       
       const jobsData = Array.isArray(res.data) ? res.data : [];
-      console.log("📝 StaffDashboard: Setting jobs with count:", jobsData.length); // Debug
-      setJobs(jobsData);
+      
+      // ✅ EXTRA SAFETY: Filter out jobs with null/undefined userId (deleted users)
+      const validJobs = jobsData.filter(job => job.userId && job.userId._id);
+      
+      console.log("📝 StaffDashboard: Setting jobs with count:", validJobs.length); // Debug
+      setJobs(validJobs);
     } catch (err) {
       console.error("❌ StaffDashboard: Error loading jobs", {
         status: err.response?.status,

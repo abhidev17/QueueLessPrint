@@ -125,7 +125,10 @@ exports.deleteUser = async (req, res) => {
       return res.status(400).json({ message: "Cannot delete your own account" });
     }
 
+    // ✅ Delete user (this triggers mongoose pre-hook cascade delete for jobs)
+    console.log(`🔥 Deleting user: ${id} (${user.email})`);
     await User.findByIdAndDelete(id);
+    console.log(`✅ User deleted successfully. Pre-hook cascade delete triggered for related jobs.`);
 
     res.json({ message: "User deleted successfully", user });
   } catch (error) {

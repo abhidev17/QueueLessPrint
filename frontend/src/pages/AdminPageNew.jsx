@@ -53,7 +53,10 @@ function AdminPageNew({ user }) {
       console.log("Loading jobs with user:", user);
       console.log("Token:", localStorage.getItem("token"));
       const res = await API.get("/print/all");
-      setJobs(res.data || []);
+      
+      // ✅ EXTRA SAFETY: Filter out jobs with null/undefined userId (deleted users)
+      const validJobs = (res.data || []).filter(job => job.userId && job.userId._id);
+      setJobs(validJobs);
     } catch (err) {
       const errorMsg = err.response?.data?.message || err.message || "Unknown error";
       toast.error(`Failed to load jobs: ${errorMsg}`);

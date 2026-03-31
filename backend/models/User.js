@@ -29,7 +29,13 @@ const UserSchema = new mongoose.Schema({
     }
 });
 
-// ✅ Middleware: Cascade delete - Delete all jobs when user is deleted
+// ✅ CASCADING DELETE MIDDLEWARE
+// When a user is deleted via findByIdAndDelete(), this pre-hook:
+// 1. Finds all jobs for that user
+// 2. Deletes all those jobs from database
+// 3. Emits Socket.IO events to update all connected clients in real-time
+// 4. Prevents "Unknown" users from appearing on staff dashboard
+// This ensures referential integrity: No orphaned jobs in database
 UserSchema.pre("findByIdAndDelete", async function(next) {
     try {
         const PrintJob = mongoose.model("PrintJob");
@@ -37,14 +43,14 @@ UserSchema.pre("findByIdAndDelete", async function(next) {
         
         const userId = this.getQuery()._id;
         
-        // Find all print jobs associated with this user
+        // 🔍 Find all print jobs associated with this user
         const deletedJobs = await PrintJob.find({ userId });
         const deletedJobIds = deletedJobs.map(job => job._id);
         
-        // Delete all jobs from database
+        // 🗑️ Delete all jobs from database
         await PrintJob.deleteMany({ userId });
         
-        // Emit bulk delete events for all deleted jobs
+        // 📡 Emit bulk delete events for all deleted jobs (real-time UI update)
         if (deletedJobIds.length > 0) {
             socketService.emitJobsBulkDeleted(deletedJobIds);
             console.log(`✅ Cascaded delete: Deleted ${deletedJobIds.length} jobs for user ${userId}`);
