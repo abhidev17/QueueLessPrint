@@ -7,6 +7,15 @@ export default function StaffSettings() {
   const { user } = useAuth();
   const { isDark, setIsDark } = useTheme();
 
+  // Safe render guard
+  if (!user) {
+    return (
+      <div className="text-center py-12">
+        <p className={isDark ? "text-gray-400" : "text-gray-600"}>Loading settings...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 max-w-2xl">
       <div>

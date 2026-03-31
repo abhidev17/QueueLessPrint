@@ -22,10 +22,11 @@ export default function StaffJobs() {
     try {
       setLoading(true);
       const response = await API.get("/print/all");
-      setJobs(response.data);
+      setJobs(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Failed to load jobs:", error);
       toast.error("Failed to load print jobs");
+      setJobs([]);
     } finally {
       setLoading(false);
     }
@@ -58,9 +59,9 @@ export default function StaffJobs() {
     }
   };
 
-  const filteredJobs = jobs.filter((job) => {
+  const filteredJobs = (jobs || []).filter((job) => {
     if (filter === "all") return true;
-    return normalize(job.status) === filter;
+    return normalize(job?.status) === filter;
   });
 
   return (
