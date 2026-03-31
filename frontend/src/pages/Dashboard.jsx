@@ -149,7 +149,7 @@ function Dashboard({ user }) {
     : { line: "#3b82f6", bar: "#10b981", text: "#1e293b" };
 
   return (
-    <div className={clsx("space-y-8", isStudent && "max-w-6xl mx-auto w-full")}>
+    <div className={clsx("space-y-8", isStudent && "max-w-5xl mx-auto w-full")}>
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
