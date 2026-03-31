@@ -45,14 +45,18 @@ function Dashboard({ user }) {
   useEffect(() => {
     loadDashboardData();
 
-    // Socket.IO listeners for real-time updates
-    socket.on("new-print-job", handleNewJob);
-    socket.on("jobUpdated", handleJobUpdate);
+    // Socket.IO listeners for real-time updates (only if socket is available)
+    if (socket && socket.on) {
+      socket.on("new-print-job", handleNewJob);
+      socket.on("jobUpdated", handleJobUpdate);
 
-    return () => {
-      socket.off("new-print-job", handleNewJob);
-      socket.off("jobUpdated", handleJobUpdate);
-    };
+      return () => {
+        if (socket && socket.off) {
+          socket.off("new-print-job", handleNewJob);
+          socket.off("jobUpdated", handleJobUpdate);
+        }
+      };
+    }
   }, [user?.role]);
 
   const loadDashboardData = async () => {
