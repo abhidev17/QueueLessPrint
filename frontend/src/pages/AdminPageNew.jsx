@@ -162,9 +162,9 @@ function AdminPageNew({ user }) {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-8 text-center"
         >
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex flex-col items-center gap-3 mb-2">
             <div className="p-3 bg-indigo-100 rounded-lg">
               <Printer className="text-indigo-600" size={28} />
             </div>
