@@ -137,7 +137,7 @@ function Dashboard({ user }) {
   };
 
   const statCards = [
-    { label: "Total Jobs", value: stats.total, icon: FileText, color: "blue" },
+    { label: isStudent ? "Total Requests" : "Total Jobs", value: stats.total, icon: FileText, color: "blue" },
     { label: "Pending", value: stats.pending, icon: Clock, color: "yellow" },
     { label: "Printing", value: stats.printing, icon: Zap, color: "purple" },
     { label: "Completed", value: stats.completed, icon: CheckCircle, color: "green" },
