@@ -66,14 +66,19 @@ exports.getAllPrintJobs = async (req, res) => {
       createdAt: -1 
     });
     
+    // ✅ CRITICAL: Filter out jobs with null userId (deleted users)
+    // This prevents "Unknown" users from appearing in admin/staff dashboards
+    const validJobs = jobs.filter(job => job.userId && job.userId._id);
+    
     // Manually sort by priority with custom order (high > normal > low)
     const priorityOrder = { high: 0, normal: 1, low: 2 };
-    const sortedJobs = jobs.sort((a, b) => {
+    const sortedJobs = validJobs.sort((a, b) => {
       const priorityDiff = (priorityOrder[a.priority] || 1) - (priorityOrder[b.priority] || 1);
       if (priorityDiff !== 0) return priorityDiff;
       return new Date(b.createdAt) - new Date(a.createdAt);
     });
     
+    console.log(`📊 Returned ${sortedJobs.length} valid jobs (filtered ${jobs.length - sortedJobs.length} with null userId)`);
     res.json(sortedJobs);
   } catch (error) {
     console.error(error);
@@ -188,6 +193,51 @@ exports.deletePrintJob = async (req, res) => {
     res.json({ message: "Print job deleted successfully", job });
   } catch (error) {
     console.error(error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// ✅ DATABASE CLEANUP: Remove all jobs with null userId (one-time use)
+// This fixes the "Unknown" user issue by removing orphaned jobs
+// Usage: Admin calls DELETE /api/print/cleanup/orphaned once
+exports.cleanupOrphanedJobs = async (req, res) => {
+  try {
+    // Find all jobs with null or missing userId
+    const orphanedJobs = await PrintJob.find({ 
+      $or: [
+        { userId: null },
+        { userId: undefined },
+        { userId: { $exists: false } }
+      ]
+    });
+
+    const count = orphanedJobs.length;
+
+    if (count === 0) {
+      return res.json({ message: "No orphaned jobs found. Database is clean!", count: 0 });
+    }
+
+    // Delete all orphaned jobs
+    const result = await PrintJob.deleteMany({
+      $or: [
+        { userId: null },
+        { userId: undefined },
+        { userId: { $exists: false } }
+      ]
+    });
+
+    // Emit bulk delete event for real-time UI update
+    if (count > 0) {
+      socketService.emitJobsBulkDeleted(orphanedJobs.map(job => job._id));
+      console.log(`🧹 Cleaned up ${count} orphaned jobs with null userId`);
+    }
+
+    res.json({ 
+      message: `✅ Successfully cleaned up ${count} orphaned jobs`, 
+      deletedCount: result.deletedCount 
+    });
+  } catch (error) {
+    console.error("Cleanup error:", error);
     res.status(500).json({ error: error.message });
   }
 };
