@@ -20,28 +20,31 @@ export default function StaffDashboard({ user }) {
   useEffect(() => {
     loadJobs();
 
-    // Listen for job updates
-    const handleJobUpdated = (updatedJob) => {
-      setJobs((prevJobs) =>
-        prevJobs.map((job) => (job._id === updatedJob._id ? { ...job, ...updatedJob } : job))
-      );
-    };
+    // Socket.IO listeners for real-time updates (only if socket is available)
+    if (socket && socket.on) {
+      const handleJobUpdated = (updatedJob) => {
+        setJobs((prevJobs) =>
+          prevJobs.map((job) => (job._id === updatedJob._id ? { ...job, ...updatedJob } : job))
+        );
+      };
 
-    // Listen for job completion notifications
-    const handleJobCompleted = (data) => {
-      toast.info(`✅ ${data.message}`, {
-        position: "top-right",
-        autoClose: 5000
-      });
-    };
+      const handleJobCompleted = (data) => {
+        toast.info(`✅ ${data.message}`, {
+          position: "top-right",
+          autoClose: 5000
+        });
+      };
 
-    socket.on("jobUpdated", handleJobUpdated);
-    socket.on("jobCompleted", handleJobCompleted);
+      socket.on("jobUpdated", handleJobUpdated);
+      socket.on("jobCompleted", handleJobCompleted);
 
-    return () => {
-      socket.off("jobUpdated", handleJobUpdated);
-      socket.off("jobCompleted", handleJobCompleted);
-    };
+      return () => {
+        if (socket && socket.off) {
+          socket.off("jobUpdated", handleJobUpdated);
+          socket.off("jobCompleted", handleJobCompleted);
+        }
+      };
+    }
   }, []);
 
   const loadJobs = async () => {
@@ -89,12 +92,26 @@ export default function StaffDashboard({ user }) {
   );
 
   const stats = {
-    total: jobs.length,
-    pending: jobs.filter(j => normalize(j.status) === "pending").length,
-    printing: jobs.filter(j => normalize(j.status) === "printing").length,
-    completed: jobs.filter(j => normalize(j.status) === "completed").length,
-    failed: jobs.filter(j => normalize(j.status) === "failed").length
+    total: jobs?.length || 0,
+    pending: (jobs || []).filter(j => normalize(j?.status) === "pending").length,
+    printing: (jobs || []).filter(j => normalize(j?.status) === "printing").length,
+    completed: (jobs || []).filter(j => normalize(j?.status) === "completed").length,
+    failed: (jobs || []).filter(j => normalize(j?.status) === "failed").length
   };
+
+  // Safe render guard
+  if (!Array.isArray(jobs)) {
+    return (
+      <div className={clsx(
+        "min-h-screen py-12 px-4",
+        isDark ? "bg-slate-900" : "bg-gradient-to-br from-slate-50 to-slate-100"
+      )}>
+        <div className="text-center">
+          <p className={isDark ? "text-slate-300" : "text-slate-600"}>Error loading jobs data</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -332,7 +349,8 @@ export default function StaffDashboard({ user }) {
             </tr>
           </thead>
           <tbody className={clsx("divide-y", isDark ? "divide-slate-700" : "divide-slate-200")}>
-            {filteredJobs.map((job, idx) => (
+            {filteredJobs && filteredJobs.length > 0 ? (
+              filteredJobs.map((job, idx) => (
               <motion.tr
                 key={job._id}
                 initial={{ opacity: 0, x: -20 }}
@@ -483,20 +501,18 @@ export default function StaffDashboard({ user }) {
                   )}
                 </td>
               </motion.tr>
-            ))}
-          </tbody>
+            ))
+            ) : (
+              <tr>
+                <td colSpan="7" className={clsx(
+                  "px-6 py-12 text-center",
+                  isDark ? "bg-slate-700 text-slate-300" : "bg-slate-50 text-slate-600"
+                )}>
+                  No {filter !== "all" ? filter : ""} jobs found
+                </td>
+              </tr>
+            )}
         </table>
-
-        {filteredJobs.length === 0 && (
-          <div className={clsx(
-            "text-center py-12",
-            isDark ? "bg-slate-700" : "bg-slate-50"
-          )}>
-            <p className={isDark ? "text-slate-300" : "text-slate-600"}>
-              No {filter !== "all" ? filter : ""} jobs found
-            </p>
-          </div>
-        )}
       </motion.div>
       </div>
     </PageWrapper>
