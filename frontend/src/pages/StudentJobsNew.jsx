@@ -174,45 +174,49 @@ function StudentJobsNew({ user }) {
                 </div>
               </div>
 
-              {/* Requests List - Row Layout */}
-              <div className="bg-white shadow-lg rounded-2xl border border-slate-200 overflow-hidden">
-                <div className="hidden md:grid md:grid-cols-12 gap-2 px-4 py-3 bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-600 uppercase tracking-wide">
-                  <span className="col-span-4">File</span>
-                  <span className="col-span-1">Copies</span>
-                  <span className="col-span-1">Paper</span>
-                  <span className="col-span-1">Color</span>
-                  <span className="col-span-1">Priority</span>
-                  <span className="col-span-2">Date & Slot</span>
-                  <span className="col-span-2">Status</span>
-                </div>
-
-                <div className="divide-y divide-slate-200">
-                  {jobs.map((job) => (
-                    <div key={job._id} className="px-4 py-3 hover:bg-slate-50 transition-colors">
-                      <div className="md:grid md:grid-cols-12 md:items-center gap-2">
-                        <div className="col-span-4 min-w-0">
-                          <p className="text-sm font-semibold text-slate-900 truncate">{job.fileName}</p>
-                          <p className="text-xs text-slate-500 md:hidden mt-1">
-                            {new Date(job.createdAt).toLocaleDateString()} • {job.slotTime}
-                          </p>
+              {/* Requests List - Matrix Layout */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {jobs.map((job) => (
+                  <div
+                    key={job._id}
+                    className="aspect-square bg-white shadow-md rounded-2xl border border-slate-200 p-4 hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                  >
+                    <div className="h-full flex flex-col">
+                      <div className="flex items-start justify-between gap-2 mb-3">
+                        <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusColor(job.status)}`}>
+                          {getStatusIcon(job.status)}
+                          <span>{job.status}</span>
                         </div>
+                        <span className="text-[11px] text-slate-500">{new Date(job.createdAt).toLocaleDateString()}</span>
+                      </div>
 
-                        <div className="col-span-1 text-sm text-slate-700 mt-2 md:mt-0">{job.copies}</div>
-                        <div className="col-span-1 text-sm text-slate-700">{job.pageSize}</div>
-                        <div className="col-span-1 text-sm text-slate-700">{job.color ? "Yes" : "B/W"}</div>
-                        <div className="col-span-1 text-sm text-slate-700 capitalize">{job.priority || "normal"}</div>
-                        <div className="col-span-2 text-sm text-slate-700 hidden md:block">{job.printDate} • {job.slotTime}</div>
+                      <p className="text-sm font-bold text-slate-900 line-clamp-2 mb-3">{job.fileName}</p>
 
-                        <div className="col-span-2 mt-2 md:mt-0">
-                          <div className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusColor(job.status)}`}>
-                            {getStatusIcon(job.status)}
-                            <span>{job.status}</span>
-                          </div>
+                      <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs mb-3">
+                        <div>
+                          <p className="text-slate-500">Copies</p>
+                          <p className="font-semibold text-slate-900">{job.copies}</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500">Paper</p>
+                          <p className="font-semibold text-slate-900">{job.pageSize}</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500">Color</p>
+                          <p className="font-semibold text-slate-900">{job.color ? "Yes" : "B/W"}</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500">Priority</p>
+                          <p className="font-semibold text-slate-900 capitalize">{job.priority || "normal"}</p>
                         </div>
                       </div>
+
+                      <div className="mt-auto pt-3 border-t border-slate-100 text-xs text-slate-600">
+                        <p className="truncate">{job.printDate} • {job.slotTime}</p>
+                      </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
             </>
           )}
