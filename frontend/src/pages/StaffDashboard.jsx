@@ -50,12 +50,31 @@ export default function StaffDashboard({ user }) {
   const loadJobs = async () => {
     try {
       setLoading(true);
+      console.log("📡 StaffDashboard: Fetching jobs from /print/all"); // Debug
+      
+      const token = localStorage.getItem("token");
+      console.log("🔐 StaffDashboard: Token available?", !!token); // Debug
+      
       const res = await API.get("/print/all");
-      setJobs(Array.isArray(res.data) ? res.data : []);
+      
+      console.log("✅ StaffDashboard: Jobs loaded successfully", {
+        count: res.data?.length || 0,
+        firstJob: res.data?.[0] ? { id: res.data[0]._id, status: res.data[0].status } : "none"
+      }); // Debug
+      
+      const jobsData = Array.isArray(res.data) ? res.data : [];
+      console.log("📝 StaffDashboard: Setting jobs with count:", jobsData.length); // Debug
+      setJobs(jobsData);
     } catch (err) {
+      console.error("❌ StaffDashboard: Error loading jobs", {
+        status: err.response?.status,
+        message: err.response?.data?.message,
+        error: err.message,
+        headers: err.response?.headers
+      }); // Debug - FULL ERROR
+      
       const errorMsg = err.response?.data?.message || "Failed to load jobs";
       toast.error(errorMsg);
-      console.error("Load jobs error:", err);
       setJobs([]);
     } finally {
       setLoading(false);

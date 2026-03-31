@@ -9,6 +9,13 @@ const API = axios.create({
 // Add token to requests
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
+  console.log("📤 API REQUEST:", {
+    method: config.method.toUpperCase(),
+    url: config.url,
+    hasToken: !!token,
+    data: config.data ? (config.data instanceof FormData ? "FormData" : config.data) : "no-data"
+  }); // Debug
+  
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

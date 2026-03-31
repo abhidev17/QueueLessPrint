@@ -62,22 +62,40 @@ export default function AuthPage() {
     try {
       let result;
       if (isLogin) {
+        console.log("🔐 AuthPage: Calling login with email:", formData.email); // Debug
         result = await login(formData.email, formData.password);
       } else {
         result = await register(formData.name, formData.email, formData.password);
       }
 
       if (result.success) {
+        console.log("✅ AuthPage: Auth successful, user data:", result.data); // Debug
         toast.success(isLogin ? "Login successful!" : "Registration successful!");
+        
+        // Role-based navigation with debug logging
         setTimeout(() => {
-          navigate(result.data?.role === "admin" ? "/admin" : "/dashboard");
+          const userRole = result.data?.role;
+          console.log("🧭 AuthPage: Determining navigation based on role:", userRole); // Debug
+          
+          let redirectTo = "/dashboard"; // Default
+          if (userRole === "admin" || userRole === "superadmin") {
+            redirectTo = "/admin";
+          } else if (userRole === "staff") {
+            redirectTo = "/staff";
+          } else {
+            redirectTo = "/dashboard";
+          }
+          
+          console.log("🚀 AuthPage: Navigating to:", redirectTo); // Debug
+          navigate(redirectTo);
         }, 500);
       } else {
+        console.error("❌ AuthPage: Login failed:", result.error); // Debug
         setErrors({ submit: result.error });
         toast.error(result.error);
       }
     } catch (err) {
-      console.error(err);
+      console.error("❌ AuthPage: Unexpected error:", err);
       toast.error("An error occurred. Please try again.");
     } finally {
       setLoading(false);

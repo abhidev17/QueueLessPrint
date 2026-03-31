@@ -13,11 +13,19 @@ export function AuthProvider({ children }) {
     const savedUser = localStorage.getItem("user");
     const token = localStorage.getItem("token");
     
+    console.log("🔄 AuthContext Init:", {
+      hasSavedUser: !!savedUser,
+      hasToken: !!token,
+      savedUserRole: savedUser ? JSON.parse(savedUser)?.role : "none"
+    }); // Debug
+    
     if (savedUser && token) {
       try {
-        setUser(JSON.parse(savedUser));
+        const user = JSON.parse(savedUser);
+        console.log("✅ AuthContext: User loaded from storage", { role: user.role, email: user.email }); // Debug
+        setUser(user);
       } catch (err) {
-        console.error("Error parsing saved user", err);
+        console.error("❌ AuthContext: Error parsing saved user", err);
         localStorage.removeItem("user");
         localStorage.removeItem("token");
       }
@@ -55,15 +63,36 @@ export function AuthProvider({ children }) {
     setLoading(true);
     setError(null);
     try {
+      console.log("🔐 LOGIN ATTEMPT:", { email }); // Debug: login start
+      
       const res = await API.post("/users/login", { email, password });
       
+      console.log("✅ LOGIN SUCCESS - Response:", res.data); // Debug: full response
+      
       const { token, user: userData } = res.data;
+      
+      if (!token || !userData) {
+        console.error("❌ LOGIN ERROR: Missing token or user data", { hasToken: !!token, hasUser: !!userData });
+        throw new Error("Invalid response from server");
+      }
+      
+      console.log("📝 STORING USER:", { id: userData._id, email: userData.email, role: userData.role }); // Debug: what we're storing
+      
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(userData));
       setUser(userData);
       
+      console.log("✅ AUTH CONTEXT UPDATED - User role:", userData.role); // Debug: context updated
+      
       return { success: true, data: userData };
     } catch (err) {
+      console.error("❌ LOGIN ERROR CAUGHT:", {
+        status: err.response?.status,
+        message: err.response?.data?.message,
+        fullError: err.message,
+        responseData: err.response?.data
+      }); // Debug: full error details
+      
       const message = err.response?.data?.message || "Login failed";
       setError(message);
       return { success: false, error: message };
