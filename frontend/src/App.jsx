@@ -12,6 +12,7 @@ import AdminPageNew from "./pages/AdminPageNew";
 import AdminUsersPage from "./pages/AdminUsersPage";
 import AdminPrintJobsPage from "./pages/AdminPrintJobsPage";
 import AdminReportsPage from "./pages/AdminReportsPage";
+import AdminSettings from "./pages/AdminSettings";
 import StaffDashboard from "./pages/StaffDashboard";
 import StaffJobs from "./pages/StaffJobs";
 import StaffSettings from "./pages/StaffSettings";
@@ -96,6 +97,7 @@ function AppContent() {
         <Route path="users" element={<AdminUsersPage user={user} />} />
         <Route path="print-jobs" element={<AdminPrintJobsPage user={user} />} />
         <Route path="reports" element={<AdminReportsPage user={user} />} />
+        <Route path="settings" element={<AdminSettings />} />
       </Route>
 
       {/* Staff Routes - Nested */}

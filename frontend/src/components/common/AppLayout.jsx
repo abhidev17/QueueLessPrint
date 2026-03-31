@@ -16,6 +16,7 @@ export function AppLayout({ children, currentPage }) {
 
   const isAdmin = user?.role === "admin" || user?.role === "superadmin";
   const isStaff = user?.role === "staff";
+  const settingsPath = isAdmin ? "/admin/settings" : isStaff ? "/staff/settings" : "/dashboard/settings";
 
   const menuItems = isAdmin
     ? [
@@ -155,11 +156,13 @@ export function AppLayout({ children, currentPage }) {
                 whileHover={{ x: 4 }}
                 className={clsx(
                   "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors mt-8 text-left",
-                  isDark
+                  currentPage === "Settings"
+                    ? "bg-blue-600 text-white"
+                    : isDark
                     ? "text-slate-300 hover:bg-slate-700"
                     : "text-slate-700 hover:bg-slate-100"
                 )}
-                onClick={() => navigate("/settings")}
+                onClick={() => navigate(settingsPath)}
               >
                 <Settings size={20} />
                 Settings

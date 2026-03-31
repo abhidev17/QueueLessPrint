@@ -6,6 +6,7 @@ const pageMap = {
   "/admin/users": "Users",
   "/admin/print-jobs": "Print Jobs",
   "/admin/reports": "Reports",
+  "/admin/settings": "Settings",
 };
 
 export function AdminLayout({ user }) {
