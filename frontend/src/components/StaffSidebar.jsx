@@ -28,7 +28,7 @@ export default function StaffSidebar() {
 
   return (
     <aside className={clsx(
-      "w-64 h-screen border-r transition-colors",
+      "w-72 h-screen border-r transition-colors",
       isDark
         ? "bg-slate-900 border-slate-800"
         : "bg-white border-slate-200"
@@ -40,13 +40,13 @@ export default function StaffSidebar() {
           ? "border-slate-800"
           : "border-slate-200"
       )}>
-        <div className="flex items-center gap-3">
-          <div className={clsx("p-2.5 rounded-xl", isDark ? "bg-indigo-500/20" : "bg-indigo-100")}>
-            <ShieldCheck size={22} className={isDark ? "text-indigo-300" : "text-indigo-600"} />
+        <div className="flex items-center gap-3.5">
+          <div className={clsx("p-3 rounded-xl", isDark ? "bg-indigo-500/20" : "bg-indigo-100")}>
+            <ShieldCheck size={24} className={isDark ? "text-indigo-300" : "text-indigo-600"} />
           </div>
           <div>
-            <h1 className={clsx("text-lg font-bold", isDark ? "text-white" : "text-slate-900")}>Staff Panel</h1>
-            <p className={clsx("text-xs", isDark ? "text-slate-400" : "text-slate-500")}>QueueLess Print</p>
+            <h1 className={clsx("text-xl font-bold", isDark ? "text-white" : "text-slate-900")}>Staff Panel</h1>
+            <p className={clsx("text-sm", isDark ? "text-slate-400" : "text-slate-500")}>QueueLess Print</p>
           </div>
         </div>
         <div className={clsx("mt-4 inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full", isDark ? "bg-emerald-500/20 text-emerald-300" : "bg-emerald-100 text-emerald-700")}>
@@ -56,7 +56,7 @@ export default function StaffSidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 space-y-2">
+      <nav className="flex-1 px-4 py-6 space-y-2.5">
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -66,7 +66,7 @@ export default function StaffSidebar() {
               end={item.to === "/staff"}
               className={({ isActive }) =>
                 clsx(
-                  "group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
+                  "group flex items-center gap-3.5 px-4 py-3.5 rounded-xl transition-all duration-200",
                   isActive
                     ? "bg-indigo-600 text-white shadow-sm ring-1 ring-indigo-400/40"
                     : isDark
@@ -77,8 +77,8 @@ export default function StaffSidebar() {
             >
               {({ isActive }) => (
                 <>
-                  <Icon size={19} className={clsx("transition-transform", isActive ? "scale-105" : "group-hover:scale-105")} />
-                  <span className="font-semibold text-[15px]">{item.label}</span>
+                  <Icon size={21} className={clsx("transition-transform", isActive ? "scale-105" : "group-hover:scale-105")} />
+                  <span className="font-semibold text-base">{item.label}</span>
                 </>
               )}
             </NavLink>
@@ -102,8 +102,8 @@ export default function StaffSidebar() {
               : "text-slate-700 hover:bg-slate-100"
           )}
         >
-          <LogOut size={19} />
-          <span>Logout</span>
+          <LogOut size={21} />
+          <span className="text-base">Logout</span>
         </button>
       </div>
     </aside>
