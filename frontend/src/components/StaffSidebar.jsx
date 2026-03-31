@@ -35,28 +35,28 @@ export default function StaffSidebar() {
     )}>
       {/* Header */}
       <div className={clsx(
-        "p-6 border-b",
+        "p-7 border-b",
         isDark
           ? "border-slate-800"
           : "border-slate-200"
       )}>
         <div className="flex items-center gap-3.5">
-          <div className={clsx("p-3 rounded-xl", isDark ? "bg-indigo-500/20" : "bg-indigo-100")}>
-            <ShieldCheck size={24} className={isDark ? "text-indigo-300" : "text-indigo-600"} />
+          <div className={clsx("p-3.5 rounded-xl", isDark ? "bg-indigo-500/20" : "bg-indigo-100")}>
+            <ShieldCheck size={26} className={isDark ? "text-indigo-300" : "text-indigo-600"} />
           </div>
           <div>
-            <h1 className={clsx("text-xl font-bold", isDark ? "text-white" : "text-slate-900")}>Staff Panel</h1>
-            <p className={clsx("text-sm", isDark ? "text-slate-400" : "text-slate-500")}>QueueLess Print</p>
+            <h1 className={clsx("text-[22px] font-bold", isDark ? "text-white" : "text-slate-900")}>Staff Panel</h1>
+            <p className={clsx("text-[13px]", isDark ? "text-slate-400" : "text-slate-500")}>QueueLess Print</p>
           </div>
         </div>
-        <div className={clsx("mt-4 inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full", isDark ? "bg-emerald-500/20 text-emerald-300" : "bg-emerald-100 text-emerald-700")}>
+        <div className={clsx("mt-4 inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1 rounded-full", isDark ? "bg-emerald-500/20 text-emerald-300" : "bg-emerald-100 text-emerald-700")}>
           <Sparkles size={12} />
           Live updates enabled
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 py-6 space-y-2.5">
+      <nav className="flex-1 px-4 py-7 space-y-3">
         {navItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -66,7 +66,7 @@ export default function StaffSidebar() {
               end={item.to === "/staff"}
               className={({ isActive }) =>
                 clsx(
-                  "group flex items-center gap-3.5 px-4 py-3.5 rounded-xl transition-all duration-200",
+                  "group flex items-center gap-4 px-4.5 py-4 rounded-xl transition-all duration-200",
                   isActive
                     ? "bg-indigo-600 text-white shadow-sm ring-1 ring-indigo-400/40"
                     : isDark
@@ -77,8 +77,8 @@ export default function StaffSidebar() {
             >
               {({ isActive }) => (
                 <>
-                  <Icon size={21} className={clsx("transition-transform", isActive ? "scale-105" : "group-hover:scale-105")} />
-                  <span className="font-semibold text-base">{item.label}</span>
+                  <Icon size={22} className={clsx("transition-transform", isActive ? "scale-105" : "group-hover:scale-105")} />
+                  <span className="font-semibold text-[17px]">{item.label}</span>
                 </>
               )}
             </NavLink>
@@ -88,7 +88,7 @@ export default function StaffSidebar() {
 
       {/* Logout */}
       <div className={clsx(
-        "p-4 border-t",
+        "p-5 border-t",
         isDark
           ? "border-slate-800"
           : "border-slate-200"
@@ -96,14 +96,14 @@ export default function StaffSidebar() {
         <button
           onClick={logout}
           className={clsx(
-            "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all",
+            "w-full flex items-center gap-3 px-4 py-3.5 rounded-xl font-medium transition-all",
             isDark
               ? "text-slate-300 hover:bg-slate-800 hover:text-white"
               : "text-slate-700 hover:bg-slate-100"
           )}
         >
-          <LogOut size={21} />
-          <span className="text-base">Logout</span>
+          <LogOut size={22} />
+          <span className="text-[17px]">Logout</span>
         </button>
       </div>
     </aside>

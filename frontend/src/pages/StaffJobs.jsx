@@ -115,17 +115,17 @@ export default function StaffJobs() {
 
   return (
     <PageWrapper>
-      <div className="space-y-5">
+      <div className="space-y-6">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={clsx("rounded-2xl border p-5", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200")}
+          className={clsx("rounded-2xl border p-6", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200")}
         >
-          <h1 className={clsx("text-2xl font-bold", isDark ? "text-white" : "text-slate-900")}>Print Jobs</h1>
-          <p className={isDark ? "text-slate-400" : "text-slate-600"}>Manage and monitor all print jobs</p>
+          <h1 className={clsx("text-3xl font-bold", isDark ? "text-white" : "text-slate-900")}>Print Jobs</h1>
+          <p className={clsx("text-base", isDark ? "text-slate-400" : "text-slate-600")}>Manage and monitor all print jobs</p>
         </motion.div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           {[
             { label: "All", value: stats.total, icon: Printer, color: "text-indigo-600 bg-indigo-50" },
             { label: "Pending", value: stats.pending, icon: Clock, color: "text-amber-600 bg-amber-50" },
@@ -135,14 +135,14 @@ export default function StaffJobs() {
           ].map((item) => {
             const Icon = item.icon;
             return (
-              <div key={item.label} className={clsx("rounded-xl border p-3.5", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200")}>
+              <div key={item.label} className={clsx("rounded-xl border p-4", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200")}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className={clsx("text-xs font-medium", isDark ? "text-slate-400" : "text-slate-500")}>{item.label}</p>
-                    <p className={clsx("text-xl font-bold", isDark ? "text-white" : "text-slate-900")}>{item.value}</p>
+                    <p className={clsx("text-sm font-medium", isDark ? "text-slate-400" : "text-slate-500")}>{item.label}</p>
+                    <p className={clsx("text-2xl font-bold", isDark ? "text-white" : "text-slate-900")}>{item.value}</p>
                   </div>
                   <div className={clsx("p-2 rounded-lg", item.color)}>
-                    <Icon size={18} />
+                    <Icon size={20} />
                   </div>
                 </div>
               </div>
