@@ -116,7 +116,11 @@ export default function StaffJobs() {
   return (
     <PageWrapper>
       <div className="space-y-5">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={clsx("rounded-2xl border p-5", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200")}
+        >
           <h1 className={clsx("text-2xl font-bold", isDark ? "text-white" : "text-slate-900")}>Print Jobs</h1>
           <p className={isDark ? "text-slate-400" : "text-slate-600"}>Manage and monitor all print jobs</p>
         </motion.div>
