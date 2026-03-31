@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Printer, RefreshCw } from "lucide-react";
+import { Printer, RefreshCw, Play, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "react-toastify";
 import API from "../api";
 import { useTheme } from "../context/ThemeContext";
@@ -10,6 +10,8 @@ export default function AdminPrintJobsPage({ user }) {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const normalize = (s) => s?.toLowerCase() || "";
 
   useEffect(() => {
     loadJobs();
@@ -42,6 +44,19 @@ export default function AdminPrintJobsPage({ user }) {
     }
   };
 
+  const updateJobStatus = async (jobId, newStatus) => {
+    try {
+      const res = await API.put(`/print/${jobId}`, { status: newStatus });
+      const updatedJob = res.data.job || res.data;
+      setJobs((prev) => prev.map((j) => (j._id === jobId ? { ...j, ...updatedJob } : j)));
+      toast.success(`Job marked as ${newStatus}`);
+    } catch (err) {
+      const errorMsg = err.response?.data?.message || "Failed to update job status";
+      toast.error(errorMsg);
+      loadJobs();
+    }
+  };
+
   const filteredJobs = jobs.filter(j =>
     j.fileName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (j.userId?.name || "").toLowerCase().includes(searchTerm.toLowerCase())
@@ -60,10 +75,19 @@ export default function AdminPrintJobsPage({ user }) {
     );
   }
 
-  const statusColors = {
-    "Pending": "bg-amber-100 text-amber-900",
-    "Printing": "bg-blue-100 text-blue-900",
-    "Completed": "bg-green-100 text-green-900"
+  const getStatusClasses = (status) => {
+    switch (normalize(status)) {
+      case "pending":
+        return "bg-amber-100 text-amber-900";
+      case "printing":
+        return "bg-blue-100 text-blue-900";
+      case "completed":
+        return "bg-emerald-100 text-emerald-900";
+      case "failed":
+        return "bg-red-100 text-red-900";
+      default:
+        return "bg-slate-100 text-slate-900";
+    }
   };
 
   return (
@@ -111,74 +135,79 @@ export default function AdminPrintJobsPage({ user }) {
         />
       </div>
 
-      {/* Jobs Table */}
-      <div className={clsx(
-        "rounded-lg overflow-hidden border",
-        isDark
-          ? "bg-slate-800 border-slate-700"
-          : "bg-white border-slate-200"
-      )}>
-        <table className="w-full">
-          <thead className={clsx(
-            isDark ? "bg-slate-700" : "bg-slate-100"
-          )}>
-            <tr>
-              <th className={clsx("px-6 py-3 text-left font-semibold", isDark ? "text-slate-200" : "text-slate-900")}>
-                File
-              </th>
-              <th className={clsx("px-6 py-3 text-left font-semibold", isDark ? "text-slate-200" : "text-slate-900")}>
-                Student
-              </th>
-              <th className={clsx("px-6 py-3 text-left font-semibold", isDark ? "text-slate-200" : "text-slate-900")}>
-                Copies
-              </th>
-              <th className={clsx("px-6 py-3 text-left font-semibold", isDark ? "text-slate-200" : "text-slate-900")}>
-                Status
-              </th>
-              <th className={clsx("px-6 py-3 text-left font-semibold", isDark ? "text-slate-200" : "text-slate-900")}>
-                Date
-              </th>
-            </tr>
-          </thead>
-          <tbody className={clsx("divide-y", isDark ? "divide-slate-700" : "divide-slate-200")}>
-            {filteredJobs.map((job) => (
-              <tr key={job._id} className={isDark ? "hover:bg-slate-700" : "hover:bg-slate-50"}>
-                <td className={clsx("px-6 py-4 font-medium truncate", isDark ? "text-white" : "text-slate-900")}>
-                  {job.fileName}
-                </td>
-                <td className={clsx("px-6 py-4", isDark ? "text-slate-300" : "text-slate-600")}>
-                  {job.userId?.name || "Unknown"}
-                </td>
-                <td className={clsx("px-6 py-4", isDark ? "text-slate-300" : "text-slate-600")}>
-                  {job.copies}
-                </td>
-                <td className="px-6 py-4">
-                  <span className={clsx(
-                    "px-3 py-1 rounded-full text-sm font-semibold",
-                    isDark
-                      ? statusColors[job.status]?.replace("bg-", "bg-opacity-30 ") || "bg-slate-700 text-slate-200"
-                      : statusColors[job.status] || "bg-slate-100 text-slate-900"
-                  )}>
+      {/* Jobs Matrix (Square Cards with Actions) */}
+      {filteredJobs.length === 0 ? (
+        <div className={clsx(
+          "rounded-lg border text-center py-12",
+          isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"
+        )}>
+          <p className={isDark ? "text-slate-300" : "text-slate-600"}>No print jobs found</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {filteredJobs.map((job) => (
+            <div
+              key={job._id}
+              className={clsx(
+                "aspect-square rounded-xl border p-4 shadow-sm hover:shadow-md transition-all",
+                isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"
+              )}
+            >
+              <div className="h-full flex flex-col">
+                <div className="flex items-start justify-between gap-2 mb-3">
+                  <span className={clsx("px-2.5 py-1 rounded-full text-xs font-semibold", getStatusClasses(job.status))}>
                     {job.status}
                   </span>
-                </td>
-                <td className={clsx("px-6 py-4", isDark ? "text-slate-300" : "text-slate-600")}>
-                  {new Date(job.createdAt).toLocaleDateString()}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  <span className={clsx("text-xs", isDark ? "text-slate-400" : "text-slate-500")}>
+                    {new Date(job.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
 
-        {filteredJobs.length === 0 && (
-          <div className={clsx(
-            "text-center py-12",
-            isDark ? "bg-slate-700" : "bg-slate-50"
-          )}>
-            <p className={isDark ? "text-slate-300" : "text-slate-600"}>No print jobs found</p>
-          </div>
-        )}
-      </div>
+                <p className={clsx("text-sm font-bold line-clamp-2 mb-2", isDark ? "text-white" : "text-slate-900")}>{job.fileName}</p>
+                <p className={clsx("text-xs mb-3", isDark ? "text-slate-400" : "text-slate-600")}>{job.userId?.name || "Unknown"}</p>
+
+                <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                  <div>
+                    <p className={isDark ? "text-slate-500" : "text-slate-500"}>Copies</p>
+                    <p className={clsx("font-semibold", isDark ? "text-slate-200" : "text-slate-800")}>{job.copies}</p>
+                  </div>
+                  <div>
+                    <p className={isDark ? "text-slate-500" : "text-slate-500"}>Paper</p>
+                    <p className={clsx("font-semibold", isDark ? "text-slate-200" : "text-slate-800")}>{job.pageSize}</p>
+                  </div>
+                </div>
+
+                <div className="mt-auto flex flex-wrap gap-2 pt-3 border-t border-slate-200/40">
+                  {normalize(job.status) === "pending" && (
+                    <button
+                      onClick={() => updateJobStatus(job._id, "printing")}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+                    >
+                      <Play size={12} /> Start
+                    </button>
+                  )}
+                  {normalize(job.status) === "printing" && (
+                    <button
+                      onClick={() => updateJobStatus(job._id, "completed")}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition"
+                    >
+                      <CheckCircle2 size={12} /> Complete
+                    </button>
+                  )}
+                  {normalize(job.status) !== "completed" && normalize(job.status) !== "failed" && (
+                    <button
+                      onClick={() => updateJobStatus(job._id, "failed")}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
+                    >
+                      <XCircle size={12} /> Fail
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -6,7 +6,7 @@ import API from "../api";
 import useSocket from "../hooks/useSocket";
 import { useTheme } from "../context/ThemeContext";
 import { PageWrapper } from "../components/PageWrapper";
-import { StatusBadge, JobTable, FilterBar, EmptyState, LoadingSpinner } from "../components/ui";
+import { StatusBadge, FilterBar, EmptyState, LoadingSpinner } from "../components/ui";
 import clsx from "clsx";
 
 export default function StaffJobs() {
@@ -146,59 +146,45 @@ export default function StaffJobs() {
         ) : filteredJobs.length === 0 ? (
           <EmptyState type="jobs" title="No print jobs found" message="Try changing filters or wait for new jobs to arrive." />
         ) : (
-          <div className="space-y-4">
-            <div className="hidden lg:block">
-              <JobTable
-                jobs={filteredJobs}
-                showUser
-                actions={[]}
-              />
-            </div>
-
-            <div className="lg:hidden grid grid-cols-1 gap-4">
-              {filteredJobs.map((job) => (
-                <div key={job._id} className={clsx("rounded-xl border p-4", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200")}>
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className={clsx("font-semibold truncate", isDark ? "text-white" : "text-slate-900")}>{job.fileName}</p>
-                      <p className={clsx("text-sm", isDark ? "text-slate-400" : "text-slate-600")}>{job.userId?.name}</p>
-                    </div>
-                    <StatusBadge status={job.status} size="sm" />
-                  </div>
-
-                  <div className="mt-3 text-sm grid grid-cols-2 gap-2">
-                    <p className={isDark ? "text-slate-300" : "text-slate-700"}>Copies: {job.copies}</p>
-                    <p className={isDark ? "text-slate-300" : "text-slate-700"}>Size: {job.pageSize}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className={clsx("rounded-xl border overflow-hidden", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200")}>
-          <div className={clsx("px-4 py-3 border-b", isDark ? "border-slate-700" : "border-slate-200")}>
-            <h2 className={clsx("font-semibold", isDark ? "text-white" : "text-slate-900")}>Quick Actions</h2>
-          </div>
-          <div className="p-4 space-y-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredJobs.map((job) => (
-              <div key={`action-${job._id}`} className="flex flex-wrap items-center justify-between gap-2 py-2 border-b border-slate-200/40 last:border-0">
-                <span className={clsx("text-sm truncate max-w-[260px]", isDark ? "text-slate-200" : "text-slate-700")}>{job.fileName}</span>
-                <div className="flex gap-2">
-                  {normalize(job.status) === "pending" && (
-                    <button onClick={() => updateJobStatus(job._id, "printing")} className="btn-primary text-xs px-3 py-1.5">Start</button>
-                  )}
-                  {normalize(job.status) === "printing" && (
-                    <button onClick={() => updateJobStatus(job._id, "completed")} className="px-3 py-1.5 text-xs rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition">Complete</button>
-                  )}
-                  {normalize(job.status) !== "completed" && normalize(job.status) !== "failed" && (
-                    <button onClick={() => updateJobStatus(job._id, "failed")} className="px-3 py-1.5 text-xs rounded-lg bg-red-600 text-white hover:bg-red-700 transition">Fail</button>
-                  )}
+              <div key={job._id} className={clsx("aspect-square rounded-xl border p-4", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200") }>
+                <div className="h-full flex flex-col">
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <StatusBadge status={job.status} size="sm" />
+                    <span className={clsx("text-xs", isDark ? "text-slate-400" : "text-slate-500")}>{new Date(job.createdAt).toLocaleDateString()}</span>
+                  </div>
+
+                  <p className={clsx("text-sm font-semibold line-clamp-2", isDark ? "text-white" : "text-slate-900")}>{job.fileName}</p>
+                  <p className={clsx("text-xs mt-1", isDark ? "text-slate-400" : "text-slate-600")}>{job.userId?.name}</p>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs mt-3">
+                    <div>
+                      <p className={isDark ? "text-slate-500" : "text-slate-500"}>Copies</p>
+                      <p className={clsx("font-medium", isDark ? "text-slate-200" : "text-slate-800")}>{job.copies}</p>
+                    </div>
+                    <div>
+                      <p className={isDark ? "text-slate-500" : "text-slate-500"}>Paper</p>
+                      <p className={clsx("font-medium", isDark ? "text-slate-200" : "text-slate-800")}>{job.pageSize}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-auto pt-3 border-t border-slate-200/40 flex flex-wrap gap-2">
+                    {normalize(job.status) === "pending" && (
+                      <button onClick={() => updateJobStatus(job._id, "printing")} className="btn-primary text-xs px-3 py-1.5">Start</button>
+                    )}
+                    {normalize(job.status) === "printing" && (
+                      <button onClick={() => updateJobStatus(job._id, "completed")} className="px-3 py-1.5 text-xs rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition">Complete</button>
+                    )}
+                    {normalize(job.status) !== "completed" && normalize(job.status) !== "failed" && (
+                      <button onClick={() => updateJobStatus(job._id, "failed")} className="px-3 py-1.5 text-xs rounded-lg bg-red-600 text-white hover:bg-red-700 transition">Fail</button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        )}
       </div>
     </PageWrapper>
   );
