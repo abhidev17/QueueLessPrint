@@ -229,6 +229,10 @@ export default function StaffDashboard({ user }) {
                 {stats.completed}
               </p>
             </div>
+            <CheckCircle className={isDark ? "text-green-400" : "text-green-600"} size={32} />
+          </div>
+        </motion.div>
+
         {/* Failed */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
