@@ -1,4 +1,5 @@
 const PrintJob = require("../models/PrintJob");
+const socketService = require("../services/socketService");
 
 exports.createPrintJob = async (req, res) => {
   try {
@@ -43,11 +44,8 @@ exports.createPrintJob = async (req, res) => {
 
     await job.save();
 
-    // Emit real-time event to all connected clients
-    const io = req.app.get("io");
-    if (io) {
-      io.emit("new-print-job", job);
-    }
+    // ✅ Emit real-time event using socket service
+    socketService.emitJobCreated(job);
 
     res.json({
       message: "Print job created successfully",
@@ -112,20 +110,18 @@ exports.updatePrintStatus = async (req, res) => {
       return res.status(404).json({ message: "Print job not found" });
     }
 
-    const io = req.app.get("io");
-    if (io) {
-      // Emit update to all staff
-      io.emit("jobUpdated", job);
-      
-      // Emit completion notification to the user when job is completed
-      if (status === "completed" && job.userId) {
-        io.emit("jobCompleted", {
-          userId: job.userId._id,
-          userName: job.userId.name,
-          fileName: job.fileName,
-          message: `Your print job "${job.fileName}" is ready for pickup!`
-        });
-      }
+    // ✅ Emit job update using socket service
+    socketService.emitJobUpdated(job);
+    
+    // Emit completion notification to the user when job is completed
+    const io = socketService.getIO();
+    if (io && status === "completed" && job.userId) {
+      io.emit("jobCompleted", {
+        userId: job.userId._id,
+        userName: job.userId.name,
+        fileName: job.fileName,
+        message: `Your print job "${job.fileName}" is ready for pickup!`
+      });
     }
 
     res.json({
@@ -185,6 +181,9 @@ exports.deletePrintJob = async (req, res) => {
     if (!job) {
       return res.status(404).json({ message: "Print job not found" });
     }
+
+    // ✅ Emit job deleted event using socket service
+    socketService.emitJobDeleted(id);
 
     res.json({ message: "Print job deleted successfully", job });
   } catch (error) {

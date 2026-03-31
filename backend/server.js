@@ -8,6 +8,8 @@ const { Server } = require("socket.io");
 
 const userRoutes = require("./routes/userRoutes");
 const printRoutes = require("./routes/printRoutes");
+const socketService = require("./services/socketService");
+const cronService = require("./services/cronService");
 const User = require("./models/User");
 
 const app = express();
@@ -33,13 +35,25 @@ const io = new Server(server, {
   }
 });
 
+// ✅ Initialize socket service
+socketService.initializeSocket(io);
+
+// ✅ Expose io instance to controllers
 app.set("io", io);
 
+// ✅ Enhanced Socket.IO connection handling
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+  console.log("✅ User connected:", socket.id);
+
+  // Optional: Join a room for broadcast filtering
+  socket.on("user:join", (data) => {
+    const userId = data.userId;
+    socket.join(`user:${userId}`);
+    console.log(`User ${userId} joined socket room`);
+  });
 
   socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
+    console.log("❌ User disconnected:", socket.id);
   });
 });
 
@@ -50,6 +64,11 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use(express.json());
+
+// ✅ Helper function to get IO instance (for socket service)
+app.getIO = function() {
+  return io;
+};
 
 app.use("/api/users", userRoutes);
 app.use("/api/print", printRoutes);
@@ -100,14 +119,36 @@ mongoose.connect(MONGODB_URI, {
   socketTimeoutMS: 45000,
 })
   .then(() => {
-    console.log("MongoDB Connected Successfully");
+    console.log("✅ MongoDB Connected Successfully");
     createAdmin();
+    
+    // ✅ Initialize cron jobs after database connection
+    cronService.initializeCrons();
   })
-  .catch(err => console.error("MongoDB connection error:", err));
+  .catch(err => console.error("❌ MongoDB connection error:", err));
 
 
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
+});
+
+// ✅ Graceful shutdown
+process.on("SIGTERM", () => {
+  console.log("🛑 SIGTERM received, shutting down gracefully...");
+  cronService.stopAllCrons();
+  server.close(() => {
+    console.log("✅ Server closed");
+    process.exit(0);
+  });
+});
+
+process.on("SIGINT", () => {
+  console.log("🛑 SIGINT received, shutting down gracefully...");
+  cronService.stopAllCrons();
+  server.close(() => {
+    console.log("✅ Server closed");
+    process.exit(0);
+  });
 });
