@@ -18,7 +18,7 @@ function Sidebar({ setPage, page, user, onLogout }) {
   const items = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     ...(isStudent ? [{ id: "student", label: "Submit Print", icon: Printer }] : []),
-    ...(isStudent ? [{ id: "jobs", label: "My Jobs", icon: FileText }] : []),
+    ...(isStudent ? [{ id: "jobs", label: "Your Requests", icon: FileText }] : []),
     ...(isStaff && !isAdmin ? [{ id: "staff", label: "Print Queue", icon: Printer }] : []),
     ...(isAdmin ? [{ id: "admin", label: "Admin Panel", icon: ShieldCheck }] : [])
   ];

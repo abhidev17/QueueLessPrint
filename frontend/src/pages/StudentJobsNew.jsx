@@ -122,14 +122,14 @@ function StudentJobsNew({ user }) {
       <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-white to-amber-50 pb-32">
         {/* Header */}
         <div className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white sticky top-0 z-10 shadow-lg">
-          <div className="max-w-md mx-auto px-4 py-6">
-            <h1 className="text-2xl font-bold flex items-center gap-2">📄 Your Jobs</h1>
+          <div className="max-w-6xl mx-auto px-4 py-6">
+            <h1 className="text-2xl font-bold flex items-center gap-2">📄 Your Requests</h1>
             <p className="text-cyan-100 text-sm">Track your print submissions</p>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="max-w-md mx-auto px-4 py-4 space-y-3">
+        <div className="max-w-6xl mx-auto px-4 py-4 space-y-4">
           {jobs.length === 0 ? (
             <div className="bg-white shadow-lg rounded-2xl p-8 text-center mt-8">
               <FileText size={48} className="mx-auto mb-4 text-cyan-400" />
@@ -174,48 +174,45 @@ function StudentJobsNew({ user }) {
                 </div>
               </div>
 
-              {/* Jobs List */}
-              <div className="space-y-3">
-                {jobs.map(job => (
-                  <div key={job._id} className="bg-white shadow-md rounded-xl p-4 border-l-4 border-cyan-500 hover:shadow-lg transition-shadow">
-                    {/* Header */}
-                    <div className="flex justify-between items-start mb-3">
-                      <div className={`flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusColor(job.status)}`}>
-                        {getStatusIcon(job.status)}
-                        <span>{job.status}</span>
-                      </div>
-                      <span className="text-xs text-slate-500">{new Date(job.createdAt).toLocaleDateString()}</span>
-                    </div>
+              {/* Requests List - Row Layout */}
+              <div className="bg-white shadow-lg rounded-2xl border border-slate-200 overflow-hidden">
+                <div className="hidden md:grid md:grid-cols-12 gap-2 px-4 py-3 bg-slate-50 border-b border-slate-200 text-xs font-semibold text-slate-600 uppercase tracking-wide">
+                  <span className="col-span-4">File</span>
+                  <span className="col-span-1">Copies</span>
+                  <span className="col-span-1">Paper</span>
+                  <span className="col-span-1">Color</span>
+                  <span className="col-span-1">Priority</span>
+                  <span className="col-span-2">Date & Slot</span>
+                  <span className="col-span-2">Status</span>
+                </div>
 
-                    {/* File Info */}
-                    <p className="text-sm font-bold text-slate-900 truncate mb-2">{job.fileName}</p>
+                <div className="divide-y divide-slate-200">
+                  {jobs.map((job) => (
+                    <div key={job._id} className="px-4 py-3 hover:bg-slate-50 transition-colors">
+                      <div className="md:grid md:grid-cols-12 md:items-center gap-2">
+                        <div className="col-span-4 min-w-0">
+                          <p className="text-sm font-semibold text-slate-900 truncate">{job.fileName}</p>
+                          <p className="text-xs text-slate-500 md:hidden mt-1">
+                            {new Date(job.createdAt).toLocaleDateString()} • {job.slotTime}
+                          </p>
+                        </div>
 
-                    {/* Details Grid */}
-                    <div className="grid grid-cols-2 gap-2 text-xs mb-3 pb-3 border-b border-slate-100">
-                      <div>
-                        <p className="text-slate-500 font-medium">Copies</p>
-                        <p className="font-bold text-slate-900">{job.copies}</p>
-                      </div>
-                      <div>
-                        <p className="text-slate-500 font-medium">Paper</p>
-                        <p className="font-bold text-slate-900">{job.pageSize}</p>
-                      </div>
-                      <div>
-                        <p className="text-slate-500 font-medium">Color</p>
-                        <p className="font-bold text-slate-900">{job.color ? "🌈 Yes" : "⚫ B&W"}</p>
-                      </div>
-                      <div>
-                        <p className="text-slate-500 font-medium">Priority</p>
-                        <p className="font-bold text-slate-900 capitalize">{job.priority || "Normal"}</p>
+                        <div className="col-span-1 text-sm text-slate-700 mt-2 md:mt-0">{job.copies}</div>
+                        <div className="col-span-1 text-sm text-slate-700">{job.pageSize}</div>
+                        <div className="col-span-1 text-sm text-slate-700">{job.color ? "Yes" : "B/W"}</div>
+                        <div className="col-span-1 text-sm text-slate-700 capitalize">{job.priority || "normal"}</div>
+                        <div className="col-span-2 text-sm text-slate-700 hidden md:block">{job.printDate} • {job.slotTime}</div>
+
+                        <div className="col-span-2 mt-2 md:mt-0">
+                          <div className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusColor(job.status)}`}>
+                            {getStatusIcon(job.status)}
+                            <span>{job.status}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
-
-                    {/* Slot Info */}
-                    <div className="text-xs">
-                      <p className="text-slate-500 font-medium">📅 {job.printDate} • ⏰ {job.slotTime}</p>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </>
           )}
@@ -230,7 +227,7 @@ function StudentJobsNew({ user }) {
             </button>
             <button className="flex flex-col items-center gap-1 text-cyan-600 bg-cyan-50 p-2 rounded-lg">
               <span className="text-xl">📄</span>
-              <span className="text-xs font-medium">Jobs</span>
+              <span className="text-xs font-medium">Requests</span>
             </button>
             <button className="flex flex-col items-center gap-1 text-slate-600 hover:text-cyan-600 transition-colors">
               <span className="text-xl">👤</span>

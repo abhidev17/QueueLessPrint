@@ -32,7 +32,7 @@ export function AppLayout({ children, currentPage }) {
     : [
         { label: "Dashboard", icon: Home, href: "/dashboard" },
         { label: "Submit Job", icon: FileText, href: "/submit-job" },
-        { label: "My Jobs", icon: BarChart3, href: "/my-jobs" },
+        { label: "Your Requests", icon: BarChart3, href: "/my-jobs" },
       ];
 
   const handleLogout = () => {

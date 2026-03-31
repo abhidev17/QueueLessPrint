@@ -20,7 +20,7 @@ export default function StudentSidebar() {
       icon: Upload,
     },
     {
-      label: "My Jobs",
+      label: "Your Requests",
       to: "/dashboard/jobs",
       icon: FileText,
     },

@@ -8,7 +8,7 @@ function Navbar({ setPage, user, onLogout }) {
 
   const menuItems = [
     ...(isAdmin ? [] : [{ id: "student", label: "Submit Print", icon: Printer }]),
-    ...(isAdmin ? [] : [{ id: "jobs", label: "My Jobs", icon: FileText }]),
+    ...(isAdmin ? [] : [{ id: "jobs", label: "Your Requests", icon: FileText }]),
     ...(isAdmin ? [{ id: "admin", label: "Admin Panel", icon: ShieldCheck }] : [])
   ];
 
