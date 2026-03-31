@@ -11,12 +11,17 @@ export default function AdminReportsPage() {
     totalUsers: 0,
     pendingJobs: 0,
     completedJobs: 0,
+    failedJobs: 0,
     statusData: [
       { name: "Pending", value: 0 },
       { name: "Printing", value: 0 },
-      { name: "Completed", value: 0 }
+      { name: "Completed", value: 0 },
+      { name: "Failed", value: 0 }
     ]
   });
+
+  // Status normalization
+  const normalize = (s) => s?.toLowerCase() || "";
 
   useEffect(() => {
     loadStats();
@@ -28,15 +33,17 @@ export default function AdminReportsPage() {
       const jobs = jobsRes.data || [];
       
       const statusData = [
-        { name: "Pending", value: jobs.filter(j => j.status === "Pending").length },
-        { name: "Printing", value: jobs.filter(j => j.status === "Printing").length },
-        { name: "Completed", value: jobs.filter(j => j.status === "Completed").length }
+        { name: "Pending", value: jobs.filter(j => normalize(j.status) === "pending").length },
+        { name: "Printing", value: jobs.filter(j => normalize(j.status) === "printing").length },
+        { name: "Completed", value: jobs.filter(j => normalize(j.status) === "completed").length },
+        { name: "Failed", value: jobs.filter(j => normalize(j.status) === "failed").length }
       ];
 
       setStats({
         totalJobs: jobs.length,
         pendingJobs: statusData[0].value,
         completedJobs: statusData[2].value,
+        failedJobs: statusData[3].value,
         statusData
       });
     } catch (err) {
@@ -47,7 +54,8 @@ export default function AdminReportsPage() {
   const COLORS = {
     Pending: "#fbbf24",
     Printing: "#3b82f6",
-    Completed: "#10b981"
+    Completed: "#10b981",
+    Failed: "#ef4444"
   };
 
   return (
@@ -66,12 +74,13 @@ export default function AdminReportsPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         {[
           { label: "Total Jobs", value: stats.totalJobs, color: "bg-blue-100 text-blue-700" },
           { label: "Pending", value: stats.pendingJobs, color: "bg-amber-100 text-amber-700" },
-          { label: "Printing", value: 0, color: "bg-cyan-100 text-cyan-700" },
-          { label: "Completed", value: stats.completedJobs, color: "bg-green-100 text-green-700" }
+          { label: "Printing", value: stats.statusData[1]?.value || 0, color: "bg-cyan-100 text-cyan-700" },
+          { label: "Completed", value: stats.completedJobs, color: "bg-green-100 text-green-700" },
+          { label: "Failed", value: stats.failedJobs, color: "bg-red-100 text-red-700" }
         ].map((stat, idx) => (
           <div key={idx} className={clsx(
             "rounded-lg p-6 border",

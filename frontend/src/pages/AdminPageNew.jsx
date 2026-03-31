@@ -10,7 +10,10 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 function AdminPageNew({ user }) {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("Pending");
+  const [filter, setFilter] = useState("all");
+
+  // Status normalization
+  const normalize = (s) => s?.toLowerCase() || "";
 
   useEffect(() => {
     loadJobs();
@@ -67,28 +70,32 @@ function AdminPageNew({ user }) {
   };
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case "Completed":
+    const normalized = normalize(status);
+    switch (normalized) {
+      case "completed":
         return "bg-emerald-100 border-emerald-300 text-emerald-900";
-      case "Printing":
+      case "printing":
         return "bg-cyan-100 border-cyan-300 text-cyan-900";
-      case "Pending":
+      case "pending":
         return "bg-amber-100 border-amber-300 text-amber-900";
+      case "failed":
+        return "bg-red-100 border-red-300 text-red-900";
       default:
         return "bg-slate-100 border-slate-300 text-slate-900";
     }
   };
 
   const filteredJobs = jobs.filter(job => {
-    if (filter === "All") return true;
-    return job.status === filter;
+    if (filter === "all") return true;
+    return normalize(job.status) === filter;
   });
 
   const stats = {
     total: jobs.length,
-    pending: jobs.filter(j => j.status === "Pending").length,
-    printing: jobs.filter(j => j.status === "Printing").length,
-    completed: jobs.filter(j => j.status === "Completed").length
+    pending: jobs.filter(j => normalize(j.status) === "pending").length,
+    printing: jobs.filter(j => normalize(j.status) === "printing").length,
+    completed: jobs.filter(j => normalize(j.status) === "completed").length,
+    failed: jobs.filter(j => normalize(j.status) === "failed").length
   };
 
   if (loading) {
@@ -168,7 +175,8 @@ function AdminPageNew({ user }) {
                   data={[
                     { name: "Pending", value: stats.pending, fill: "#f59e0b" },
                     { name: "Printing", value: stats.printing, fill: "#0ea5e9" },
-                    { name: "Completed", value: stats.completed, fill: "#10b981" }
+                    { name: "Completed", value: stats.completed, fill: "#10b981" },
+                    { name: "Failed", value: stats.failed, fill: "#ef4444" }
                   ]}
                 >
                   <XAxis dataKey="name" stroke="#64748b" />
@@ -209,7 +217,7 @@ function AdminPageNew({ user }) {
 
           {/* Filter Tabs */}
           <div className="flex gap-2 mb-6 flex-wrap">
-            {["All", "Pending", "Printing", "Completed"].map(status => (
+            {["all", "pending", "printing", "completed", "failed"].map(status => (
               <button
                 key={status}
                 onClick={() => setFilter(status)}
@@ -219,7 +227,7 @@ function AdminPageNew({ user }) {
                     : "bg-white text-slate-700 border border-slate-300 hover:bg-slate-50"
                 }`}
               >
-                {status}
+                {status.charAt(0).toUpperCase() + status.slice(1)}
               </button>
             ))}
           </div>

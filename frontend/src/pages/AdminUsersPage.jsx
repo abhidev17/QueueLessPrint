@@ -48,7 +48,8 @@ export default function AdminUsersPage({ user }) {
   const updateRole = async (userId, newRole) => {
     try {
       const res = await API.put(`/users/${userId}`, { role: newRole });
-      setUsers(users.map(u => (u._id === userId ? res.data.user : u)));
+      const updatedUser = res.data.user || res.data;
+      setUsers(users.map(u => (u._id === userId ? { ...u, ...updatedUser } : u)));
       toast.success(`User role updated to ${newRole}`);
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Failed to update user role";
