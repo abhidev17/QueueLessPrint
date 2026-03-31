@@ -198,15 +198,9 @@ export default function StaffDashboard() {
                     >
                       {job.status}
                     </span>
-                    {normalize(job.status) === "pending" && (
-                      <button onClick={() => updateStatus(job._id, "printing")} className="px-3 py-1.5 text-xs rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">Start</button>
-                    )}
-                    {normalize(job.status) === "printing" && (
-                      <button onClick={() => updateStatus(job._id, "completed")} className="px-3 py-1.5 text-xs rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition">Complete</button>
-                    )}
-                    {normalize(job.status) !== "completed" && normalize(job.status) !== "failed" && (
-                      <button onClick={() => updateStatus(job._id, "failed")} className="px-3 py-1.5 text-xs rounded-lg bg-red-600 text-white hover:bg-red-700 transition">Fail</button>
-                    )}
+                    <span className={clsx("px-2.5 py-1 rounded-full text-[11px]", isDark ? "bg-slate-700 text-slate-300" : "bg-slate-100 text-slate-600")}>
+                      Action in Print Jobs
+                    </span>
                   </div>
                 </div>
               ))}
