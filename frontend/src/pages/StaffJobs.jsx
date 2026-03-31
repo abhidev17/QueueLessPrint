@@ -115,13 +115,13 @@ export default function StaffJobs() {
 
   return (
     <PageWrapper>
-      <div className="space-y-6">
+      <div className="space-y-5">
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className={clsx("text-3xl font-bold", isDark ? "text-white" : "text-slate-900")}>Print Jobs</h1>
+          <h1 className={clsx("text-2xl font-bold", isDark ? "text-white" : "text-slate-900")}>Print Jobs</h1>
           <p className={isDark ? "text-slate-400" : "text-slate-600"}>Manage and monitor all print jobs</p>
         </motion.div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
           {[
             { label: "All", value: stats.total, icon: Printer, color: "text-indigo-600 bg-indigo-50" },
             { label: "Pending", value: stats.pending, icon: Clock, color: "text-amber-600 bg-amber-50" },
@@ -131,11 +131,11 @@ export default function StaffJobs() {
           ].map((item) => {
             const Icon = item.icon;
             return (
-              <div key={item.label} className={clsx("rounded-xl border p-4", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200")}>
+              <div key={item.label} className={clsx("rounded-xl border p-3.5", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200")}>
                 <div className="flex items-center justify-between">
                   <div>
                     <p className={clsx("text-xs font-medium", isDark ? "text-slate-400" : "text-slate-500")}>{item.label}</p>
-                    <p className={clsx("text-2xl font-bold", isDark ? "text-white" : "text-slate-900")}>{item.value}</p>
+                    <p className={clsx("text-xl font-bold", isDark ? "text-white" : "text-slate-900")}>{item.value}</p>
                   </div>
                   <div className={clsx("p-2 rounded-lg", item.color)}>
                     <Icon size={18} />
@@ -161,17 +161,17 @@ export default function StaffJobs() {
         ) : filteredJobs.length === 0 ? (
           <EmptyState type="jobs" title="No print jobs found" message="Try changing filters or wait for new jobs to arrive." />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
             {filteredJobs.map((job) => (
               <div
                 key={job._id}
                 className={clsx(
-                  "aspect-square rounded-xl border p-4 shadow-sm hover:shadow-md transition-all",
+                  "rounded-xl border p-3.5 h-[220px] shadow-sm hover:shadow-md transition-all",
                   isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200"
                 )}
               >
                 <div className="h-full flex flex-col">
-                  <div className="flex items-start justify-between gap-2 mb-3">
+                  <div className="flex items-start justify-between gap-2 mb-2">
                     <span className={clsx("px-2.5 py-1 rounded-full text-xs font-semibold capitalize", getStatusClasses(job.status))}>
                       {job.status}
                     </span>
@@ -180,13 +180,13 @@ export default function StaffJobs() {
 
                   <p
                     title={job.fileName}
-                    className={clsx("text-sm font-bold line-clamp-2 min-h-[2.6rem] mb-2", isDark ? "text-white" : "text-slate-900")}
+                    className={clsx("text-[13px] font-bold line-clamp-2 min-h-[2.3rem] mb-1.5", isDark ? "text-white" : "text-slate-900")}
                   >
                     {job.fileName}
                   </p>
-                  <p className={clsx("text-xs mb-3 min-h-[1rem] truncate", isDark ? "text-slate-400" : "text-slate-600")}>{job.userId?.name || "Unknown"}</p>
+                  <p className={clsx("text-[11px] mb-2.5 min-h-[1rem] truncate", isDark ? "text-slate-400" : "text-slate-600")}>{job.userId?.name || "Unknown"}</p>
 
-                  <div className="grid grid-cols-2 gap-2 text-xs mb-3 min-h-[3rem]">
+                  <div className="grid grid-cols-2 gap-2 text-[11px] mb-2.5 min-h-[2.75rem]">
                     <div>
                       <p className={isDark ? "text-slate-500" : "text-slate-500"}>Copies</p>
                       <p className={clsx("font-semibold", isDark ? "text-slate-200" : "text-slate-800")}>{job.copies}</p>
@@ -197,11 +197,11 @@ export default function StaffJobs() {
                     </div>
                   </div>
 
-                  <div className="mt-auto pt-3 border-t border-slate-200/40 flex flex-wrap gap-2">
+                  <div className="mt-auto pt-2.5 border-t border-slate-200/40 flex flex-wrap gap-1.5">
                     {normalize(job.status) === "pending" && (
                       <button
                         onClick={() => updateJobStatus(job._id, "printing")}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+                        className="inline-flex items-center gap-1 px-2 py-1 text-[11px] rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
                       >
                         <Play size={12} /> Start
                       </button>
@@ -209,7 +209,7 @@ export default function StaffJobs() {
                     {normalize(job.status) === "printing" && (
                       <button
                         onClick={() => updateJobStatus(job._id, "completed")}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition"
+                        className="inline-flex items-center gap-1 px-2 py-1 text-[11px] rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition"
                       >
                         <CheckCircle2 size={12} /> Complete
                       </button>
@@ -217,7 +217,7 @@ export default function StaffJobs() {
                     {normalize(job.status) !== "completed" && normalize(job.status) !== "failed" && (
                       <button
                         onClick={() => updateJobStatus(job._id, "failed")}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
+                        className="inline-flex items-center gap-1 px-2 py-1 text-[11px] rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
                       >
                         <XCircle size={12} /> Fail
                       </button>

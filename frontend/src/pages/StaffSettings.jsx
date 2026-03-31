@@ -17,20 +17,20 @@ export default function StaffSettings() {
   }
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-5 max-w-2xl">
       <div>
-        <h1 className="text-3xl font-bold">Settings</h1>
-        <p className={isDark ? "text-gray-400" : "text-gray-600"}>
+        <h1 className={clsx("text-2xl font-bold", isDark ? "text-white" : "text-slate-900")}>Settings</h1>
+        <p className={isDark ? "text-slate-400" : "text-slate-600"}>
           Manage your preferences and account settings
         </p>
       </div>
 
       {/* Account Section */}
       <div className={clsx(
-        "rounded-lg border p-6 space-y-4",
+        "rounded-xl border p-5 space-y-4",
         isDark
-          ? "bg-gray-800 border-gray-700"
-          : "bg-white border-gray-200"
+          ? "bg-slate-800 border-slate-700"
+          : "bg-white border-slate-200"
       )}>
         <div className="flex items-center gap-3 pb-4 border-b" style={{
           borderColor: isDark ? "#374151" : "#e5e7eb"
@@ -42,15 +42,15 @@ export default function StaffSettings() {
         <div>
           <label className={clsx(
             "text-sm font-medium",
-            isDark ? "text-gray-300" : "text-gray-700"
+            isDark ? "text-slate-300" : "text-slate-700"
           )}>
             Name
           </label>
           <div className={clsx(
             "mt-2 px-4 py-2 rounded-lg border",
             isDark
-              ? "bg-gray-700 border-gray-600 text-gray-300"
-              : "bg-gray-50 border-gray-300 text-gray-700"
+              ? "bg-slate-700 border-slate-600 text-slate-300"
+              : "bg-slate-50 border-slate-300 text-slate-700"
           )}>
             {user?.name}
           </div>
@@ -59,15 +59,15 @@ export default function StaffSettings() {
         <div>
           <label className={clsx(
             "text-sm font-medium",
-            isDark ? "text-gray-300" : "text-gray-700"
+            isDark ? "text-slate-300" : "text-slate-700"
           )}>
             Email
           </label>
           <div className={clsx(
             "mt-2 px-4 py-2 rounded-lg border",
             isDark
-              ? "bg-gray-700 border-gray-600 text-gray-300"
-              : "bg-gray-50 border-gray-300 text-gray-700"
+              ? "bg-slate-700 border-slate-600 text-slate-300"
+              : "bg-slate-50 border-slate-300 text-slate-700"
           )}>
             {user?.email}
           </div>
@@ -76,15 +76,15 @@ export default function StaffSettings() {
         <div>
           <label className={clsx(
             "text-sm font-medium",
-            isDark ? "text-gray-300" : "text-gray-700"
+            isDark ? "text-slate-300" : "text-slate-700"
           )}>
             Role
           </label>
           <div className={clsx(
             "mt-2 px-4 py-2 rounded-lg border capitalize",
             isDark
-              ? "bg-gray-700 border-gray-600 text-gray-300"
-              : "bg-gray-50 border-gray-300 text-gray-700"
+                    ? "bg-slate-700 border-slate-600 text-slate-300"
+                    : "bg-slate-50 border-slate-300 text-slate-700"
           )}>
             {user?.role}
           </div>
@@ -93,10 +93,10 @@ export default function StaffSettings() {
 
       {/* Appearance Section */}
       <div className={clsx(
-        "rounded-lg border p-6 space-y-4",
+        "rounded-xl border p-5 space-y-4",
         isDark
-          ? "bg-gray-800 border-gray-700"
-          : "bg-white border-gray-200"
+          ? "bg-slate-800 border-slate-700"
+          : "bg-white border-slate-200"
       )}>
         <div className="flex items-center gap-3 pb-4 border-b" style={{
           borderColor: isDark ? "#374151" : "#e5e7eb"
@@ -108,7 +108,7 @@ export default function StaffSettings() {
         <div className="flex items-center justify-between">
           <label className={clsx(
             "text-sm font-medium",
-            isDark ? "text-gray-300" : "text-gray-700"
+            isDark ? "text-slate-300" : "text-slate-700"
           )}>
             Dark Mode
           </label>
@@ -116,7 +116,7 @@ export default function StaffSettings() {
             onClick={() => setIsDark(!isDark)}
             className={clsx(
               "w-12 h-6 rounded-full transition-colors flex items-center padding-1",
-              isDark ? "bg-blue-600" : "bg-gray-300"
+              isDark ? "bg-blue-600" : "bg-slate-300"
             )}
           >
             <div className={clsx(
@@ -129,10 +129,10 @@ export default function StaffSettings() {
 
       {/* Notifications Section */}
       <div className={clsx(
-        "rounded-lg border p-6 space-y-4",
+        "rounded-xl border p-5 space-y-4",
         isDark
-          ? "bg-gray-800 border-gray-700"
-          : "bg-white border-gray-200"
+          ? "bg-slate-800 border-slate-700"
+          : "bg-white border-slate-200"
       )}>
         <div className="flex items-center gap-3 pb-4 border-b" style={{
           borderColor: isDark ? "#374151" : "#e5e7eb"
@@ -144,7 +144,7 @@ export default function StaffSettings() {
         <div className="flex items-center justify-between">
           <label className={clsx(
             "text-sm font-medium",
-            isDark ? "text-gray-300" : "text-gray-700"
+            isDark ? "text-slate-300" : "text-slate-700"
           )}>
             Email Notifications
           </label>
@@ -158,7 +158,7 @@ export default function StaffSettings() {
         <div className="flex items-center justify-between">
           <label className={clsx(
             "text-sm font-medium",
-            isDark ? "text-gray-300" : "text-gray-700"
+            isDark ? "text-slate-300" : "text-slate-700"
           )}>
             Job Status Updates
           </label>
@@ -172,10 +172,10 @@ export default function StaffSettings() {
 
       {/* Security Section */}
       <div className={clsx(
-        "rounded-lg border p-6 space-y-4",
+        "rounded-xl border p-5 space-y-4",
         isDark
-          ? "bg-gray-800 border-gray-700"
-          : "bg-white border-gray-200"
+          ? "bg-slate-800 border-slate-700"
+          : "bg-white border-slate-200"
       )}>
         <div className="flex items-center gap-3 pb-4 border-b" style={{
           borderColor: isDark ? "#374151" : "#e5e7eb"
