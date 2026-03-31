@@ -1,11 +1,16 @@
 import { Outlet } from "react-router-dom";
-import Sidebar from "./StudentSidebar";
+import StudentSidebar from "./StudentSidebar";
 
 export function StudentLayout() {
   return (
-    <div className="flex h-screen">
-      <Sidebar />
-      <div className="flex-1 p-6 overflow-auto bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900">
+      {/* Fixed Sidebar */}
+      <div className="fixed left-0 top-0 h-screen w-64 bg-gradient-to-b from-slate-900 to-slate-950 shadow-2xl border-r border-slate-800 z-1000 overflow-y-auto">
+        <StudentSidebar />
+      </div>
+
+      {/* Main Content with Offset */}
+      <div className="ml-64 w-full overflow-y-auto h-screen">
         <Outlet />
       </div>
     </div>
