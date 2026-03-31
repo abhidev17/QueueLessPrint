@@ -13,14 +13,16 @@ function Navbar({ setPage, user, onLogout }) {
   ];
 
   return (
-    <nav className="bg-gradient-to-r from-indigo-600 to-pink-500 text-white shadow-lg sticky top-0 z-50">
+    <nav className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/90 backdrop-blur-xl text-slate-900 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <Printer size={28} className="animate-bounce" />
-            <h1 className="text-2xl font-bold hidden sm:block">QueueLess Print</h1>
-            <h1 className="text-2xl font-bold sm:hidden">QLP</h1>
+            <div className="p-2 rounded-lg bg-indigo-100 text-indigo-700">
+              <Printer size={20} />
+            </div>
+            <h1 className="text-xl font-bold hidden sm:block">QueueLess Print</h1>
+            <h1 className="text-xl font-bold sm:hidden">QLP</h1>
           </div>
 
           {/* Desktop Menu */}
@@ -31,9 +33,9 @@ function Navbar({ setPage, user, onLogout }) {
                 <button
                   key={item.id}
                   onClick={() => setPage(item.id)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white hover:bg-opacity-20 transition-all duration-200"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-all duration-200"
                 >
-                  <Icon size={20} />
+                  <Icon size={18} />
                   {item.label}
                 </button>
               );
@@ -42,13 +44,13 @@ function Navbar({ setPage, user, onLogout }) {
 
           {/* User Info & Logout */}
           <div className="hidden md:flex items-center gap-4">
-            <span className="text-sm font-medium opacity-90">{user?.name}</span>
-            <span className="text-xs bg-white bg-opacity-20 px-2 py-1 rounded">
+            <span className="text-sm font-medium text-slate-700">{user?.name}</span>
+            <span className="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded-full">
               {isAdmin ? "Admin" : "Student"}
             </span>
             <button
               onClick={onLogout}
-              className="flex items-center gap-2 bg-white bg-opacity-20 px-4 py-2 rounded-lg hover:bg-opacity-30 transition-all duration-200"
+              className="flex items-center gap-2 bg-slate-100 text-slate-700 px-4 py-2 rounded-lg hover:bg-slate-200 transition-all duration-200"
             >
               <LogOut size={18} />
               Logout
@@ -66,7 +68,7 @@ function Navbar({ setPage, user, onLogout }) {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden pb-4 border-t border-white border-opacity-20">
+          <div className="md:hidden pb-4 border-t border-slate-200">
             {menuItems.map(item => {
               const Icon = item.icon;
               return (
@@ -76,25 +78,25 @@ function Navbar({ setPage, user, onLogout }) {
                     setPage(item.id);
                     setIsOpen(false);
                   }}
-                  className="flex items-center gap-2 w-full px-4 py-3 text-left hover:bg-white hover:bg-opacity-10 transition-all"
+                  className="flex items-center gap-2 w-full px-4 py-3 text-left text-slate-700 hover:bg-slate-100 transition-all"
                 >
                   <Icon size={18} />
                   {item.label}
                 </button>
               );
             })}
-            <div className="border-t border-white border-opacity-20 mt-2 pt-2">
+            <div className="border-t border-slate-200 mt-2 pt-2">
               <div className="px-4 py-2">
-                <p className="text-sm opacity-75">Signed in as</p>
+                <p className="text-sm text-slate-500">Signed in as</p>
                 <p className="font-medium">{user?.name}</p>
-                <p className="text-xs opacity-75 mt-1">{isAdmin ? "Admin" : "Student"}</p>
+                <p className="text-xs text-slate-500 mt-1">{isAdmin ? "Admin" : "Student"}</p>
               </div>
               <button
                 onClick={() => {
                   onLogout();
                   setIsOpen(false);
                 }}
-                className="flex items-center gap-2 w-full px-4 py-2 text-left hover:bg-white hover:bg-opacity-10 transition-all"
+                className="flex items-center gap-2 w-full px-4 py-2 text-left text-slate-700 hover:bg-slate-100 transition-all"
               >
                 <LogOut size={18} />
                 Logout
