@@ -14,7 +14,7 @@ const printJobSchema = new mongoose.Schema({
   slotTime: String,
   status: {
     type: String,
-    enum: ["pending", "printing", "completed"],
+    enum: ["pending", "printing", "completed", "failed"],
     default: "pending"
   },
   priority: {

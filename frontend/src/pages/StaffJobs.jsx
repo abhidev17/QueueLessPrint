@@ -18,7 +18,7 @@ export default function StaffJobs() {
   const loadJobs = async () => {
     try {
       setLoading(true);
-      const response = await API.get("/print/jobs");
+      const response = await API.get("/print/all");
       setJobs(response.data);
     } catch (error) {
       console.error("Failed to load jobs:", error);
@@ -28,11 +28,24 @@ export default function StaffJobs() {
     }
   };
 
+  const updateJobStatus = async (jobId, newStatus) => {
+    try {
+      const response = await API.put(`/print/${jobId}`, { status: newStatus });
+      const updatedJob = response.data.job || response.data;
+      setJobs(jobs.map(job => job._id === jobId ? updatedJob : job));
+      toast.success(`Job marked as ${newStatus}`);
+    } catch (error) {
+      console.error("Failed to update job:", error);
+      toast.error("Failed to update job status");
+      loadJobs();
+    }
+  };
+
   const getStatusIcon = (status) => {
     switch (status) {
       case "completed":
         return <CheckCircle className="text-green-500" size={20} />;
-      case "processing":
+      case "printing":
         return <Clock className="text-blue-500 animate-spin" size={20} />;
       case "failed":
         return <AlertCircle className="text-red-500" size={20} />;
@@ -56,8 +69,8 @@ export default function StaffJobs() {
       </div>
 
       {/* Filter */}
-      <div className="flex gap-2">
-        {["all", "pending", "processing", "completed", "failed"].map((status) => (
+      <div className="flex gap-2 flex-wrap">
+        {["all", "pending", "printing", "completed", "failed"].map((status) => (
           <button
             key={status}
             onClick={() => setFilter(status)}
@@ -116,6 +129,9 @@ export default function StaffJobs() {
                   <th className="px-6 py-3 text-left text-sm font-semibold">
                     Submitted
                   </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -129,8 +145,10 @@ export default function StaffJobs() {
                         : "border-gray-200 hover:bg-gray-50"
                     )}
                   >
-                    <td className="px-6 py-4 text-sm">{job.filename}</td>
-                    <td className="px-6 py-4 text-sm">{job.userId?.name}</td>
+                    <td className="px-6 py-4 text-sm">{job.fileName}</td>
+                    <td className="px-6 py-4 text-sm">
+                      {job.userId?.name || "Unknown User"}
+                    </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         {getStatusIcon(job.status)}
@@ -139,6 +157,34 @@ export default function StaffJobs() {
                     </td>
                     <td className="px-6 py-4 text-sm">
                       {new Date(job.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-2">
+                        {job.status === "pending" && (
+                          <button
+                            onClick={() => updateJobStatus(job._id, "printing")}
+                            className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                          >
+                            Start
+                          </button>
+                        )}
+                        {job.status === "printing" && (
+                          <button
+                            onClick={() => updateJobStatus(job._id, "completed")}
+                            className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition"
+                          >
+                            Complete
+                          </button>
+                        )}
+                        {job.status !== "completed" && (
+                          <button
+                            onClick={() => updateJobStatus(job._id, "failed")}
+                            className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition"
+                          >
+                            Fail
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}

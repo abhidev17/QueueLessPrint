@@ -58,7 +58,8 @@ export default function StaffDashboard({ user }) {
   const updateStatus = async (jobId, newStatus) => {
     try {
       const res = await API.put(`/print/${jobId}`, { status: newStatus });
-      setJobs(jobs.map(j => (j._id === jobId ? res.data : j)));
+      const updatedJob = res.data.job || res.data;
+      setJobs(jobs.map(j => (j._id === jobId ? updatedJob : j)));
       toast.success(`Job marked as ${newStatus}`);
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Failed to update job";
