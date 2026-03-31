@@ -13,6 +13,8 @@ import AdminUsersPage from "./pages/AdminUsersPage";
 import AdminPrintJobsPage from "./pages/AdminPrintJobsPage";
 import AdminReportsPage from "./pages/AdminReportsPage";
 import StaffDashboard from "./pages/StaffDashboard";
+import StaffJobs from "./pages/StaffJobs";
+import StaffSettings from "./pages/StaffSettings";
 import ErrorBoundary from "./components/ErrorBoundary";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -111,6 +113,8 @@ function AppContent() {
         }
       >
         <Route index element={<StaffDashboard user={user} />} />
+        <Route path="jobs" element={<StaffJobs user={user} />} />
+        <Route path="settings" element={<StaffSettings user={user} />} />
       </Route>
 
       {/* Catch all */}

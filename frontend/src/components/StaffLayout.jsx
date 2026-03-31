@@ -1,17 +1,13 @@
-import { Outlet, useLocation } from "react-router-dom";
-import { AppLayout } from "./common/AppLayout";
+import { Outlet } from "react-router-dom";
+import StaffSidebar from "./StaffSidebar";
 
-const pageMap = {
-  "/staff": "Print Queue",
-};
-
-export function StaffLayout({ user }) {
-  const location = useLocation();
-  const currentPage = pageMap[location.pathname] || "Print Queue";
-
+export function StaffLayout() {
   return (
-    <AppLayout currentPage={currentPage}>
-      <Outlet />
-    </AppLayout>
+    <div className="flex h-screen">
+      <StaffSidebar />
+      <div className="flex-1 p-6 overflow-auto bg-gray-50 dark:bg-gray-900">
+        <Outlet />
+      </div>
+    </div>
   );
 }
