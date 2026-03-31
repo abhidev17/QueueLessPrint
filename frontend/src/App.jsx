@@ -3,6 +3,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { AppLayout } from "./components/common/AppLayout";
 import { AdminLayout } from "./components/AdminLayout";
+import { StaffLayout } from "./components/StaffLayout";
 import AuthPage from "./pages/AuthPage";
 import Dashboard from "./pages/Dashboard";
 import StudentPageNew from "./pages/StudentPageNew";
@@ -100,17 +101,17 @@ function AppContent() {
         <Route path="reports" element={<AdminReportsPage user={user} />} />
       </Route>
 
-      {/* Staff Routes */}
+      {/* Staff Routes - Nested */}
       <Route
         path="/staff"
         element={
           <ProtectedRoute allowedRoles={["staff", "admin", "superadmin"]}>
-            <AppLayout currentPage="Print Queue">
-              <StaffDashboard user={user} />
-            </AppLayout>
+            <StaffLayout user={user} />
           </ProtectedRoute>
         }
-      />
+      >
+        <Route index element={<StaffDashboard user={user} />} />
+      </Route>
 
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
