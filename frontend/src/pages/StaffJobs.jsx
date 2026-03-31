@@ -178,10 +178,15 @@ export default function StaffJobs() {
                     <span className={clsx("text-xs", isDark ? "text-slate-400" : "text-slate-500")}>{new Date(job.createdAt).toLocaleDateString()}</span>
                   </div>
 
-                  <p className={clsx("text-sm font-bold line-clamp-2 mb-2", isDark ? "text-white" : "text-slate-900")}>{job.fileName}</p>
-                  <p className={clsx("text-xs mb-3", isDark ? "text-slate-400" : "text-slate-600")}>{job.userId?.name || "Unknown"}</p>
+                  <p
+                    title={job.fileName}
+                    className={clsx("text-sm font-bold line-clamp-2 min-h-[2.6rem] mb-2", isDark ? "text-white" : "text-slate-900")}
+                  >
+                    {job.fileName}
+                  </p>
+                  <p className={clsx("text-xs mb-3 min-h-[1rem] truncate", isDark ? "text-slate-400" : "text-slate-600")}>{job.userId?.name || "Unknown"}</p>
 
-                  <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                  <div className="grid grid-cols-2 gap-2 text-xs mb-3 min-h-[3rem]">
                     <div>
                       <p className={isDark ? "text-slate-500" : "text-slate-500"}>Copies</p>
                       <p className={clsx("font-semibold", isDark ? "text-slate-200" : "text-slate-800")}>{job.copies}</p>
