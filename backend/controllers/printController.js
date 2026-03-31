@@ -22,7 +22,7 @@ exports.createPrintJob = async (req, res) => {
     const slotCount = await PrintJob.countDocuments({
       slotTime: slotTime,
       printDate: printDate,
-      status: { $ne: "Completed" }
+      status: { $in: [/^pending$/i, /^printing$/i] }
     });
 
     if (slotCount >= 3) {
@@ -154,7 +154,7 @@ exports.getSlots = async (req, res) => {
       const count = await PrintJob.countDocuments({
         slotTime: slot,
         printDate: printDate,
-        status: { $ne: "Completed" }
+        status: { $in: [/^pending$/i, /^printing$/i] }
       });
 
       result.push({
