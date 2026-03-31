@@ -44,7 +44,7 @@ export default function StaffDashboard({ user }) {
   const loadJobs = async () => {
     try {
       setLoading(true);
-      const res = await API.get("/jobs");
+      const res = await API.get("/print/all");
       setJobs(res.data || []);
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Failed to load jobs";
@@ -57,7 +57,7 @@ export default function StaffDashboard({ user }) {
 
   const updateStatus = async (jobId, newStatus) => {
     try {
-      const res = await API.put(`/jobs/${jobId}`, { status: newStatus });
+      const res = await API.put(`/print/${jobId}`, { status: newStatus });
       setJobs(jobs.map(j => (j._id === jobId ? res.data : j)));
       toast.success(`Job marked as ${newStatus}`);
     } catch (err) {
