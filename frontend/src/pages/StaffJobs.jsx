@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
-import { Printer, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { motion } from "framer-motion";
+import { Printer, Clock, Zap, CheckCircle2, AlertCircle } from "lucide-react";
 import { toast } from "react-toastify";
 import API from "../api";
+import useSocket from "../hooks/useSocket";
 import { useTheme } from "../context/ThemeContext";
+import { PageWrapper } from "../components/PageWrapper";
+import { StatusBadge, JobTable, FilterBar, EmptyState, LoadingSpinner } from "../components/ui";
 import clsx from "clsx";
 
 export default function StaffJobs() {
@@ -10,9 +14,31 @@ export default function StaffJobs() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Status normalization
   const normalize = (s) => s?.toLowerCase() || "";
+
+  const handleJobCreated = (newJob) => {
+    setJobs((prevJobs) => [newJob, ...prevJobs]);
+    toast.success(`New job: ${newJob.fileName}`);
+  };
+
+  const handleJobUpdated = (updatedJob) => {
+    setJobs((prevJobs) =>
+      prevJobs.map((job) => (job._id === updatedJob._id ? { ...job, ...updatedJob } : job))
+    );
+  };
+
+  const handleJobDeleted = (data) => {
+    setJobs((prevJobs) => prevJobs.filter((job) => job._id !== data.jobId));
+  };
+
+  const handleJobsBulkDeleted = (data) => {
+    setJobs((prevJobs) => prevJobs.filter((job) => !data.jobIds.includes(job._id)));
+  };
+
+  useSocket(handleJobCreated, handleJobUpdated, handleJobDeleted, handleJobsBulkDeleted);
 
   useEffect(() => {
     loadJobs();
@@ -22,7 +48,9 @@ export default function StaffJobs() {
     try {
       setLoading(true);
       const response = await API.get("/print/all");
-      setJobs(Array.isArray(response.data) ? response.data : []);
+      const jobsData = Array.isArray(response.data) ? response.data : [];
+      const validJobs = jobsData.filter((job) => job.userId && job.userId._id);
+      setJobs(validJobs);
     } catch (error) {
       console.error("Failed to load jobs:", error);
       toast.error("Failed to load print jobs");
@@ -45,159 +73,133 @@ export default function StaffJobs() {
     }
   };
 
-  const getStatusIcon = (status) => {
-    const normalized = normalize(status);
-    switch (normalized) {
-      case "completed":
-        return <CheckCircle className="text-green-500" size={20} />;
-      case "printing":
-        return <Clock className="text-blue-500 animate-spin" size={20} />;
-      case "failed":
-        return <AlertCircle className="text-red-500" size={20} />;
-      default:
-        return <Printer className="text-gray-500" size={20} />;
-    }
-  };
-
   const filteredJobs = (jobs || []).filter((job) => {
-    if (filter === "all") return true;
-    return normalize(job?.status) === filter;
+    const statusMatch = filter === "all" || normalize(job?.status) === filter;
+    const searchMatch =
+      !searchQuery ||
+      job?.fileName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      job?.userId?.name?.toLowerCase().includes(searchQuery.toLowerCase());
+    return statusMatch && searchMatch;
   });
 
+  const stats = {
+    total: jobs.length,
+    pending: jobs.filter((j) => normalize(j.status) === "pending").length,
+    printing: jobs.filter((j) => normalize(j.status) === "printing").length,
+    completed: jobs.filter((j) => normalize(j.status) === "completed").length,
+    failed: jobs.filter((j) => normalize(j.status) === "failed").length,
+  };
+
+  const statusFilters = [
+    { value: "all", label: "All" },
+    { value: "pending", label: "Pending" },
+    { value: "printing", label: "Printing" },
+    { value: "completed", label: "Completed" },
+    { value: "failed", label: "Failed" },
+  ];
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Print Jobs</h1>
-        <p className={isDark ? "text-gray-400" : "text-gray-600"}>
-          Manage and monitor all print jobs
-        </p>
-      </div>
+    <PageWrapper>
+      <div className="space-y-6">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          <h1 className={clsx("text-3xl font-bold", isDark ? "text-white" : "text-slate-900")}>Print Jobs</h1>
+          <p className={isDark ? "text-slate-400" : "text-slate-600"}>Manage and monitor all print jobs</p>
+        </motion.div>
 
-      {/* Filter */}
-      <div className="flex gap-2 flex-wrap">
-        {["all", "pending", "printing", "completed", "failed"].map((status) => (
-          <button
-            key={status}
-            onClick={() => setFilter(status)}
-            className={clsx(
-              "px-4 py-2 rounded-lg transition-colors capitalize font-medium",
-              filter === status
-                ? "bg-blue-600 text-white"
-                : isDark
-                ? "bg-gray-800 text-gray-300 hover:bg-gray-700"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            )}
-          >
-            {status}
-          </button>
-        ))}
-      </div>
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          {[
+            { label: "All", value: stats.total, icon: Printer, color: "text-indigo-600 bg-indigo-50" },
+            { label: "Pending", value: stats.pending, icon: Clock, color: "text-amber-600 bg-amber-50" },
+            { label: "Printing", value: stats.printing, icon: Zap, color: "text-blue-600 bg-blue-50" },
+            { label: "Completed", value: stats.completed, icon: CheckCircle2, color: "text-emerald-600 bg-emerald-50" },
+            { label: "Failed", value: stats.failed, icon: AlertCircle, color: "text-red-600 bg-red-50" },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <div key={item.label} className={clsx("rounded-xl border p-4", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200")}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className={clsx("text-xs font-medium", isDark ? "text-slate-400" : "text-slate-500")}>{item.label}</p>
+                    <p className={clsx("text-2xl font-bold", isDark ? "text-white" : "text-slate-900")}>{item.value}</p>
+                  </div>
+                  <div className={clsx("p-2 rounded-lg", item.color)}>
+                    <Icon size={18} />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
 
-      {/* Jobs List */}
-      <div className={clsx(
-        "rounded-lg border",
-        isDark
-          ? "bg-gray-800 border-gray-700"
-          : "bg-white border-gray-200"
-      )}>
+        <FilterBar
+          searchValue={searchQuery}
+          onSearchChange={setSearchQuery}
+          selectedFilter={filter}
+          onFilterChange={setFilter}
+          filters={statusFilters}
+        />
+
         {loading ? (
-          <div className="p-8 text-center">
-            <p className={isDark ? "text-gray-400" : "text-gray-600"}>
-              Loading jobs...
-            </p>
+          <div className={clsx("rounded-xl border p-8", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200")}>
+            <LoadingSpinner message="Loading print jobs..." />
           </div>
         ) : filteredJobs.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className={isDark ? "text-gray-400" : "text-gray-600"}>
-              No jobs found
-            </p>
-          </div>
+          <EmptyState type="jobs" title="No print jobs found" message="Try changing filters or wait for new jobs to arrive." />
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className={clsx(
-                  "border-b",
-                  isDark
-                    ? "bg-gray-700 border-gray-600"
-                    : "bg-gray-100 border-gray-200"
-                )}>
-                  <th className="px-6 py-3 text-left text-sm font-semibold">
-                    Filename
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold">
-                    User
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold">
-                    Submitted
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredJobs.map((job) => (
-                  <tr
-                    key={job._id}
-                    className={clsx(
-                      "border-b transition-colors",
-                      isDark
-                        ? "border-gray-700 hover:bg-gray-700"
-                        : "border-gray-200 hover:bg-gray-50"
-                    )}
-                  >
-                    <td className="px-6 py-4 text-sm">{job.fileName}</td>
-                    <td className="px-6 py-4 text-sm">
-                      {job.userId?.name || "Unknown User"}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        {getStatusIcon(job.status)}
-                        <span className="capitalize text-sm">{job.status}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      {new Date(job.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex gap-2">
-                        {normalize(job.status) === "pending" && (
-                          <button
-                            onClick={() => updateJobStatus(job._id, "printing")}
-                            className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition"
-                          >
-                            Start
-                          </button>
-                        )}
-                        {normalize(job.status) === "printing" && (
-                          <button
-                            onClick={() => updateJobStatus(job._id, "completed")}
-                            className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition"
-                          >
-                            Complete
-                          </button>
-                        )}
-                        {normalize(job.status) !== "completed" && normalize(job.status) !== "failed" && (
-                          <button
-                            onClick={() => updateJobStatus(job._id, "failed")}
-                            className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition"
-                          >
-                            Fail
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="space-y-4">
+            <div className="hidden lg:block">
+              <JobTable
+                jobs={filteredJobs}
+                showUser
+                actions={[]}
+              />
+            </div>
+
+            <div className="lg:hidden grid grid-cols-1 gap-4">
+              {filteredJobs.map((job) => (
+                <div key={job._id} className={clsx("rounded-xl border p-4", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200")}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className={clsx("font-semibold truncate", isDark ? "text-white" : "text-slate-900")}>{job.fileName}</p>
+                      <p className={clsx("text-sm", isDark ? "text-slate-400" : "text-slate-600")}>{job.userId?.name}</p>
+                    </div>
+                    <StatusBadge status={job.status} size="sm" />
+                  </div>
+
+                  <div className="mt-3 text-sm grid grid-cols-2 gap-2">
+                    <p className={isDark ? "text-slate-300" : "text-slate-700"}>Copies: {job.copies}</p>
+                    <p className={isDark ? "text-slate-300" : "text-slate-700"}>Size: {job.pageSize}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
+
+        <div className={clsx("rounded-xl border overflow-hidden", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200")}>
+          <div className={clsx("px-4 py-3 border-b", isDark ? "border-slate-700" : "border-slate-200")}>
+            <h2 className={clsx("font-semibold", isDark ? "text-white" : "text-slate-900")}>Quick Actions</h2>
+          </div>
+          <div className="p-4 space-y-2">
+            {filteredJobs.map((job) => (
+              <div key={`action-${job._id}`} className="flex flex-wrap items-center justify-between gap-2 py-2 border-b border-slate-200/40 last:border-0">
+                <span className={clsx("text-sm truncate max-w-[260px]", isDark ? "text-slate-200" : "text-slate-700")}>{job.fileName}</span>
+                <div className="flex gap-2">
+                  {normalize(job.status) === "pending" && (
+                    <button onClick={() => updateJobStatus(job._id, "printing")} className="btn-primary text-xs px-3 py-1.5">Start</button>
+                  )}
+                  {normalize(job.status) === "printing" && (
+                    <button onClick={() => updateJobStatus(job._id, "completed")} className="px-3 py-1.5 text-xs rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition">Complete</button>
+                  )}
+                  {normalize(job.status) !== "completed" && normalize(job.status) !== "failed" && (
+                    <button onClick={() => updateJobStatus(job._id, "failed")} className="px-3 py-1.5 text-xs rounded-lg bg-red-600 text-white hover:bg-red-700 transition">Fail</button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
-    </div>
+    </PageWrapper>
   );
 }
