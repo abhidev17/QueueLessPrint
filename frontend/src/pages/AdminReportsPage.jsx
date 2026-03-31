@@ -116,8 +116,9 @@ export default function AdminReportsPage() {
           <h2 className={clsx("font-bold mb-4", isDark ? "text-white" : "text-slate-900")}>
             Job Status Distribution
           </h2>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
+          {stats.statusData && stats.statusData.length > 0 && stats.statusData.some(d => d.value > 0) ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
               <Pie
                 data={stats.statusData}
                 cx="50%"
@@ -135,7 +136,11 @@ export default function AdminReportsPage() {
               <Tooltip />
             </PieChart>
           </ResponsiveContainer>
-        </div>
+          ) : (
+            <div className={clsx("flex items-center justify-center h-64", isDark ? "text-slate-400" : "text-slate-500")}>
+              <p>No job status data available</p>
+            </div>
+          )}
 
         {/* Performance Metrics */}
         <div className={clsx(

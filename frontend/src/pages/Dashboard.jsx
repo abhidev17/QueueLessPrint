@@ -230,7 +230,7 @@ function Dashboard({ user }) {
             </h3>
             {loading ? (
               <Skeleton className="h-64 w-full" />
-            ) : (
+            ) : chartData && chartData.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={chartData}>
                   <CartesianGrid
@@ -282,6 +282,10 @@ function Dashboard({ user }) {
                   />
                 </LineChart>
               </ResponsiveContainer>
+            ) : (
+              <div className={clsx("flex items-center justify-center h-64", isDark ? "text-slate-400" : "text-slate-500")}>
+                <p>No chart data available</p>
+              </div>
             )}
           </Card>
         </motion.div>
@@ -298,7 +302,7 @@ function Dashboard({ user }) {
             </h3>
             {loading ? (
               <Skeleton className="h-64 w-full" />
-            ) : (
+            ) : stats.total > 0 ? (
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                   <Pie
@@ -329,6 +333,10 @@ function Dashboard({ user }) {
                   />
                 </PieChart>
               </ResponsiveContainer>
+            ) : (
+              <div className={clsx("flex items-center justify-center h-64", isDark ? "text-slate-400" : "text-slate-500")}>
+                <p>No jobs yet</p>
+              </div>
             )}
           </Card>
         </motion.div>

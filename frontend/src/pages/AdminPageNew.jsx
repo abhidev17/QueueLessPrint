@@ -140,12 +140,13 @@ function AdminPageNew({ user }) {
           </motion.div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
             {[
               { label: "Total Jobs", value: stats.total, color: "bg-cyan-100 text-cyan-700" },
               { label: "Pending", value: stats.pending, color: "bg-amber-100 text-amber-700" },
               { label: "Printing", value: stats.printing, color: "bg-sky-100 text-sky-700" },
-              { label: "Completed", value: stats.completed, color: "bg-emerald-100 text-emerald-700" }
+              { label: "Completed", value: stats.completed, color: "bg-emerald-100 text-emerald-700" },
+              { label: "Failed", value: stats.failed, color: "bg-red-100 text-red-700" }
             ].map((stat, idx) => (
               <motion.div
                 key={idx}
@@ -170,32 +171,39 @@ function AdminPageNew({ user }) {
           >
             <h2 className="text-xl font-bold text-slate-900 mb-4">📊 Job Status Analytics</h2>
             <div className="w-full h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={[
-                    { name: "Pending", value: stats.pending, fill: "#f59e0b" },
-                    { name: "Printing", value: stats.printing, fill: "#0ea5e9" },
-                    { name: "Completed", value: stats.completed, fill: "#10b981" },
-                    { name: "Failed", value: stats.failed, fill: "#ef4444" }
-                  ]}
-                >
-                  <XAxis dataKey="name" stroke="#64748b" />
-                  <YAxis stroke="#64748b" />
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: "8px" }}
-                    cursor={{ fill: "rgba(0,0,0,0.1)" }}
-                  />
-                  <Bar dataKey="value" radius={[8, 8, 0, 0]}>
-                    {[
-                      { name: "Pending", fill: "#f59e0b" },
-                      { name: "Printing", fill: "#0ea5e9" },
-                      { name: "Completed", fill: "#10b981" }
-                    ].map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+              {jobs.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={[
+                      { name: "Pending", value: stats.pending, fill: "#f59e0b" },
+                      { name: "Printing", value: stats.printing, fill: "#0ea5e9" },
+                      { name: "Completed", value: stats.completed, fill: "#10b981" },
+                      { name: "Failed", value: stats.failed, fill: "#ef4444" }
+                    ]}
+                  >
+                    <XAxis dataKey="name" stroke="#64748b" />
+                    <YAxis stroke="#64748b" />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: "8px" }}
+                      cursor={{ fill: "rgba(0,0,0,0.1)" }}
+                    />
+                    <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+                      {[
+                        { name: "Pending", fill: "#f59e0b" },
+                        { name: "Printing", fill: "#0ea5e9" },
+                        { name: "Completed", fill: "#10b981" },
+                        { name: "Failed", fill: "#ef4444" }
+                      ].map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center h-full text-slate-400">
+                  <p>No job data available</p>
+                </div>
+              )}
             </div>
             
             {/* Summary Stats */}
