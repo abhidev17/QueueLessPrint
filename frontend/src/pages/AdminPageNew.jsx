@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import API from "../api";
-import socket from "../socket";
-import { AlertCircle, Loader2, RefreshCw, Printer } from "lucide-react";
+import useSocket from "../hooks/useSocket";
+import { AlertCircle, Loader2, Printer } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import { PageWrapper } from "../components/PageWrapper";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
@@ -15,27 +15,36 @@ function AdminPageNew({ user }) {
   // Status normalization
   const normalize = (s) => s?.toLowerCase() || "";
 
+  // Real-time socket event listeners
+  const handleJobCreated = (newJob) => {
+    setJobs((prevJobs) => [newJob, ...prevJobs]);
+    toast.success(`✅ New job: ${newJob.fileName}`);
+  };
+
+  const handleJobUpdated = (updatedJob) => {
+    setJobs((prevJobs) =>
+      prevJobs.map((job) => (job._id === updatedJob._id ? { ...job, ...updatedJob } : job))
+    );
+    toast.info(`📍 Job updated: ${updatedJob.status}`);
+  };
+
+  const handleJobDeleted = (data) => {
+    setJobs((prevJobs) => prevJobs.filter((job) => job._id !== data.jobId));
+    toast.warning(`🗑️ Job deleted`);
+  };
+
+  const handleJobsBulkDeleted = (data) => {
+    setJobs((prevJobs) =>
+      prevJobs.filter((job) => !data.jobIds.includes(job._id))
+    );
+    toast.warning(`🗑️ ${data.jobIds.length} jobs removed (cleanup)`);
+  };
+
+  // Register socket listeners
+  useSocket(handleJobCreated, handleJobUpdated, handleJobDeleted, handleJobsBulkDeleted);
+
   useEffect(() => {
     loadJobs();
-
-    const handleNewJob = (newJob) => {
-      setJobs((prevJobs) => [newJob, ...prevJobs]);
-      toast.info("New print job received!");
-    };
-
-    const handleJobUpdated = (updatedJob) => {
-      setJobs((prevJobs) =>
-        prevJobs.map((job) => (job._id === updatedJob._id ? { ...job, ...updatedJob } : job))
-      );
-    };
-
-    socket.on("new-print-job", handleNewJob);
-    socket.on("jobUpdated", handleJobUpdated);
-
-    return () => {
-      socket.off("new-print-job", handleNewJob);
-      socket.off("jobUpdated", handleJobUpdated);
-    };
   }, []);
 
   const loadJobs = async () => {
@@ -128,15 +137,6 @@ function AdminPageNew({ user }) {
               </h1>
               <p className="text-slate-600">Manage and monitor all print jobs</p>
             </div>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={loadJobs}
-              className="btn-primary flex items-center gap-2"
-            >
-              <RefreshCw size={18} />
-              Refresh
-            </motion.button>
           </motion.div>
 
           {/* Stats */}

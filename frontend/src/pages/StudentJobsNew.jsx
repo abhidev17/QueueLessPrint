@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import API from "../api";
-import socket from "../socket";
+import useSocket from "../hooks/useSocket";
 import { FileText, Clock, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 
@@ -11,50 +11,50 @@ function StudentJobsNew({ user }) {
   // Status normalization
   const normalize = (s) => s?.toLowerCase() || "";
 
-  useEffect(() => {
-    loadJobs();
+  // Real-time socket event listeners (filtered for current user)
+  const handleJobCreated = (newJob) => {
+    if (newJob.userId === user?._id) {
+      setJobs((prevJobs) => [newJob, ...prevJobs]);
+      toast.success(`✅ Job submitted: ${newJob.fileName}`);
+    }
+  };
 
-    const handleJobUpdated = (updatedJob) => {
+  const handleJobUpdated = (updatedJob) => {
+    if (updatedJob.userId === user?._id) {
       setJobs((prevJobs) =>
         prevJobs.map((job) => (job._id === updatedJob._id ? { ...job, ...updatedJob } : job))
       );
-    };
+      toast.info(`📍 Job updated: ${updatedJob.status}`);
+    }
+  };
 
-    const handleNewJob = (newJob) => {
-      // Only add if it belongs to current user
-      if (newJob.userId === user?._id) {
-        setJobs((prevJobs) => [newJob, ...prevJobs]);
-        toast.info("New print job submitted!");
+  const handleJobDeleted = (data) => {
+    // Check if the deleted job belongs to current user
+    setJobs((prevJobs) => {
+      const updated = prevJobs.filter((job) => job._id !== data.jobId);
+      if (updated.length < prevJobs.length) {
+        // Job was deleted and it's in our list, so it's ours
+        toast.warning(`🗑️ Your job was deleted`);
       }
-    };
+      return updated;
+    });
+  };
 
-    const handleJobCompleted = (data) => {
-      // Show notification if the completed job belongs to current user
-      if (data.userId === user?._id) {
-        toast.success(`✅ ${data.message}`, {
-          position: "top-right",
-          autoClose: 5000
-        });
-        // Update the job status in the list
-        setJobs((prevJobs) =>
-          prevJobs.map((job) => 
-            job.fileName === data.fileName 
-              ? { ...job, status: "completed" } 
-              : job
-          )
-        );
+  const handleJobsBulkDeleted = (data) => {
+    setJobs((prevJobs) => {
+      const updated = prevJobs.filter((job) => !data.jobIds.includes(job._id));
+      if (updated.length < prevJobs.length) {
+        toast.warning(`🗑️ ${prevJobs.length - updated.length} of your jobs were removed`);
       }
-    };
+      return updated;
+    });
+  };
 
-    socket.on("jobUpdated", handleJobUpdated);
-    socket.on("new-print-job", handleNewJob);
-    socket.on("jobCompleted", handleJobCompleted);
+  // Register socket listeners
+  useSocket(handleJobCreated, handleJobUpdated, handleJobDeleted, handleJobsBulkDeleted);
 
-    return () => {
-      socket.off("jobUpdated", handleJobUpdated);
-      socket.off("new-print-job", handleNewJob);
-      socket.off("jobCompleted", handleJobCompleted);
-    };
+  useEffect(() => {
+    loadJobs();
   }, [user]);
 
   const loadJobs = async () => {

@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Printer, Clock, Zap, CheckCircle, AlertCircle } from "lucide-react";
 import { toast } from "react-toastify";
 import API from "../api";
-import socket from "../socket";
+import useSocket from "../hooks/useSocket";
 import { useTheme } from "../context/ThemeContext";
 import { PageWrapper } from "../components/PageWrapper";
 import clsx from "clsx";
@@ -17,34 +17,36 @@ export default function StaffDashboard({ user }) {
   // Status normalization
   const normalize = (s) => s?.toLowerCase() || "";
 
+  // Real-time socket event listeners
+  const handleJobCreated = (newJob) => {
+    setJobs((prevJobs) => [newJob, ...prevJobs]);
+    toast.success(`✅ New job: ${newJob.fileName}`);
+  };
+
+  const handleJobUpdated = (updatedJob) => {
+    setJobs((prevJobs) =>
+      prevJobs.map((job) => (job._id === updatedJob._id ? { ...job, ...updatedJob } : job))
+    );
+    toast.info(`📍 Job updated: ${updatedJob.status}`);
+  };
+
+  const handleJobDeleted = (data) => {
+    setJobs((prevJobs) => prevJobs.filter((job) => job._id !== data.jobId));
+    toast.warning(`🗑️ Job deleted`);
+  };
+
+  const handleJobsBulkDeleted = (data) => {
+    setJobs((prevJobs) =>
+      prevJobs.filter((job) => !data.jobIds.includes(job._id))
+    );
+    toast.warning(`🗑️ ${data.jobIds.length} jobs removed (cleanup)`);
+  };
+
+  // Register socket listeners
+  useSocket(handleJobCreated, handleJobUpdated, handleJobDeleted, handleJobsBulkDeleted);
+
   useEffect(() => {
     loadJobs();
-
-    // Socket.IO listeners for real-time updates (only if socket is available)
-    if (socket && socket.on) {
-      const handleJobUpdated = (updatedJob) => {
-        setJobs((prevJobs) =>
-          prevJobs.map((job) => (job._id === updatedJob._id ? { ...job, ...updatedJob } : job))
-        );
-      };
-
-      const handleJobCompleted = (data) => {
-        toast.info(`✅ ${data.message}`, {
-          position: "top-right",
-          autoClose: 5000
-        });
-      };
-
-      socket.on("jobUpdated", handleJobUpdated);
-      socket.on("jobCompleted", handleJobCompleted);
-
-      return () => {
-        if (socket && socket.off) {
-          socket.off("jobUpdated", handleJobUpdated);
-          socket.off("jobCompleted", handleJobCompleted);
-        }
-      };
-    }
   }, []);
 
   const loadJobs = async () => {
