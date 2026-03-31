@@ -8,41 +8,33 @@ import { useTheme } from "../context/ThemeContext";
 import { PageWrapper } from "../components/PageWrapper";
 import clsx from "clsx";
 
-export default function StaffDashboard({ user }) {
+export default function StaffDashboard() {
   const { isDark } = useTheme();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
 
-  // Status normalization
   const normalize = (s) => s?.toLowerCase() || "";
 
-  // Real-time socket event listeners
   const handleJobCreated = (newJob) => {
     setJobs((prevJobs) => [newJob, ...prevJobs]);
-    toast.success(`✅ New job: ${newJob.fileName}`);
+    toast.success(`New job: ${newJob.fileName}`);
   };
 
   const handleJobUpdated = (updatedJob) => {
     setJobs((prevJobs) =>
       prevJobs.map((job) => (job._id === updatedJob._id ? { ...job, ...updatedJob } : job))
     );
-    toast.info(`📍 Job updated: ${updatedJob.status}`);
   };
 
   const handleJobDeleted = (data) => {
     setJobs((prevJobs) => prevJobs.filter((job) => job._id !== data.jobId));
-    toast.warning(`🗑️ Job deleted`);
   };
 
   const handleJobsBulkDeleted = (data) => {
-    setJobs((prevJobs) =>
-      prevJobs.filter((job) => !data.jobIds.includes(job._id))
-    );
-    toast.warning(`🗑️ ${data.jobIds.length} jobs removed (cleanup)`);
+    setJobs((prevJobs) => prevJobs.filter((job) => !data.jobIds.includes(job._id)));
   };
 
-  // Register socket listeners
   useSocket(handleJobCreated, handleJobUpdated, handleJobDeleted, handleJobsBulkDeleted);
 
   useEffect(() => {
@@ -52,33 +44,11 @@ export default function StaffDashboard({ user }) {
   const loadJobs = async () => {
     try {
       setLoading(true);
-      console.log("📡 StaffDashboard: Fetching jobs from /print/all"); // Debug
-      
-      const token = localStorage.getItem("token");
-      console.log("🔐 StaffDashboard: Token available?", !!token); // Debug
-      
       const res = await API.get("/print/all");
-      
-      console.log("✅ StaffDashboard: Jobs loaded successfully", {
-        count: res.data?.length || 0,
-        firstJob: res.data?.[0] ? { id: res.data[0]._id, status: res.data[0].status } : "none"
-      }); // Debug
-      
       const jobsData = Array.isArray(res.data) ? res.data : [];
-      
-      // ✅ EXTRA SAFETY: Filter out jobs with null/undefined userId (deleted users)
-      const validJobs = jobsData.filter(job => job.userId && job.userId._id);
-      
-      console.log("📝 StaffDashboard: Setting jobs with count:", validJobs.length); // Debug
+      const validJobs = jobsData.filter((job) => job.userId && job.userId._id);
       setJobs(validJobs);
     } catch (err) {
-      console.error("❌ StaffDashboard: Error loading jobs", {
-        status: err.response?.status,
-        message: err.response?.data?.message,
-        error: err.message,
-        headers: err.response?.headers
-      }); // Debug - FULL ERROR
-      
       const errorMsg = err.response?.data?.message || "Failed to load jobs";
       toast.error(errorMsg);
       setJobs([]);
@@ -91,17 +61,15 @@ export default function StaffDashboard({ user }) {
     try {
       const res = await API.put(`/print/${jobId}`, { status: newStatus });
       const updatedJob = res.data.job || res.data;
-      setJobs(jobs.map(j => (j._id === jobId ? updatedJob : j)));
+      setJobs((prev) => prev.map((j) => (j._id === jobId ? { ...j, ...updatedJob } : j)));
       toast.success(`Job marked as ${newStatus}`);
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Failed to update job";
       toast.error(errorMsg);
-      console.error(err);
       loadJobs();
     }
   };
 
-  // Sort by priority (high > normal > low) then filter
   const sortByPriority = (jobsToSort) => {
     const priorityOrder = { high: 0, normal: 1, low: 2 };
     return [...jobsToSort].sort((a, b) => {
@@ -111,436 +79,142 @@ export default function StaffDashboard({ user }) {
     });
   };
 
-  const prioritySortedJobs = sortByPriority(jobs);
-  
-  const filteredJobs = prioritySortedJobs.filter(job =>
+  const filteredJobs = sortByPriority(jobs).filter((job) =>
     filter === "all" ? true : normalize(job.status) === filter
   );
 
   const stats = {
-    total: jobs?.length || 0,
-    pending: (jobs || []).filter(j => normalize(j?.status) === "pending").length,
-    printing: (jobs || []).filter(j => normalize(j?.status) === "printing").length,
-    completed: (jobs || []).filter(j => normalize(j?.status) === "completed").length,
-    failed: (jobs || []).filter(j => normalize(j?.status) === "failed").length
+    total: jobs.length,
+    pending: jobs.filter((j) => normalize(j.status) === "pending").length,
+    printing: jobs.filter((j) => normalize(j.status) === "printing").length,
+    completed: jobs.filter((j) => normalize(j.status) === "completed").length,
+    failed: jobs.filter((j) => normalize(j.status) === "failed").length,
   };
-
-  // Safe render guard
-  if (!Array.isArray(jobs)) {
-    return (
-      <div className={clsx(
-        "min-h-screen py-12 px-4",
-        isDark ? "bg-slate-900" : "bg-gradient-to-br from-slate-50 to-slate-100"
-      )}>
-        <div className="text-center">
-          <p className={isDark ? "text-slate-300" : "text-slate-600"}>Error loading jobs data</p>
-        </div>
-      </div>
-    );
-  }
 
   if (loading) {
     return (
-      <div className={clsx(
-        "min-h-screen py-12 px-4",
-        isDark ? "bg-slate-900" : "bg-gradient-to-br from-slate-50 to-slate-100"
-      )}>
-        <div className="text-center">
+      <PageWrapper>
+        <div className="text-center py-16">
           <p className={isDark ? "text-slate-300" : "text-slate-600"}>Loading jobs...</p>
         </div>
-      </div>
+      </PageWrapper>
     );
   }
 
   return (
     <PageWrapper>
-      <div className={clsx(
-        "space-y-6",
-        isDark ? "bg-slate-900" : "bg-gradient-to-br from-slate-50 to-slate-100"
-      )}>
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-        >
+      <div className={clsx("space-y-6", isDark ? "bg-slate-900" : "bg-gradient-to-br from-slate-50 to-slate-100")}>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className={clsx("text-3xl font-bold flex items-center gap-2", isDark ? "text-white" : "text-slate-900")}>
-            <Printer size={32} />
+            <Printer size={30} />
             Print Queue Management
           </h1>
-          <p className={isDark ? "text-slate-400" : "text-slate-600"}>
-            Manage and process print jobs
-          </p>
+          <p className={isDark ? "text-slate-400" : "text-slate-600"}>Manage and process print jobs</p>
         </motion.div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Total Jobs */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            whileHover={{ scale: 1.05 }}
-            className={clsx(
-              "rounded-lg p-6 border",
-              isDark
-                ? "bg-slate-800 border-slate-700"
-                : "bg-white border-slate-200"
-            )}
-          >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className={clsx("text-sm font-medium opacity-75", isDark ? "text-slate-400" : "text-slate-600")}>
-                Total Jobs
-              </p>
-              <p className={clsx("text-3xl font-bold", isDark ? "text-white" : "text-slate-900")}>
-                {stats.total}
-              </p>
-            </div>
-            <Printer className={isDark ? "text-blue-400" : "text-blue-600"} size={32} />
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          {[
+            { label: "All", value: stats.total, icon: Printer, color: "text-indigo-600 bg-indigo-50" },
+            { label: "Pending", value: stats.pending, icon: Clock, color: "text-amber-600 bg-amber-50" },
+            { label: "Printing", value: stats.printing, icon: Zap, color: "text-blue-600 bg-blue-50" },
+            { label: "Completed", value: stats.completed, icon: CheckCircle, color: "text-emerald-600 bg-emerald-50" },
+            { label: "Failed", value: stats.failed, icon: AlertCircle, color: "text-red-600 bg-red-50" },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <div key={item.label} className={clsx("rounded-xl border p-4", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200")}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className={clsx("text-xs font-medium", isDark ? "text-slate-400" : "text-slate-500")}>{item.label}</p>
+                    <p className={clsx("text-2xl font-bold", isDark ? "text-white" : "text-slate-900")}>{item.value}</p>
+                  </div>
+                  <div className={clsx("p-2 rounded-lg", item.color)}>
+                    <Icon size={18} />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className={clsx("rounded-xl border p-4 flex flex-wrap gap-2", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200")}>
+          {["all", "pending", "printing", "completed", "failed"].map((status) => (
+            <button
+              key={status}
+              onClick={() => setFilter(status)}
+              className={clsx(
+                "px-3 py-1.5 rounded-full text-sm font-medium capitalize transition",
+                filter === status
+                  ? "bg-indigo-600 text-white"
+                  : isDark
+                  ? "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+              )}
+            >
+              {status}
+            </button>
+          ))}
+        </div>
+
+        {filteredJobs.length === 0 ? (
+          <div className={clsx("rounded-xl border py-12 text-center", isDark ? "bg-slate-800 border-slate-700 text-slate-300" : "bg-white border-slate-200 text-slate-600")}>
+            No {filter !== "all" ? filter : ""} jobs found
           </div>
-          </motion.div>
-
-        {/* Pending */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.15 }}
-          whileHover={{ scale: 1.05 }}
-          className={clsx(
-            "rounded-lg p-6 border",
-            isDark
-              ? "bg-slate-800 border-slate-700"
-              : "bg-white border-slate-200"
-          )}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className={clsx("text-sm font-medium opacity-75", isDark ? "text-slate-400" : "text-slate-600")}>
-                Pending
-              </p>
-              <p className={clsx("text-3xl font-bold text-yellow-600", isDark ? "text-yellow-400" : "text-yellow-600")}>
-                {stats.pending}
-              </p>
-            </div>
-            <Clock className={isDark ? "text-yellow-400" : "text-yellow-600"} size={32} />
-          </div>
-        </motion.div>
-
-        {/* Printing */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 }}
-          whileHover={{ scale: 1.05 }}
-          className={clsx(
-            "rounded-lg p-6 border",
-            isDark
-              ? "bg-slate-800 border-slate-700"
-              : "bg-white border-slate-200"
-          )}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className={clsx("text-sm font-medium opacity-75", isDark ? "text-slate-400" : "text-slate-600")}>
-                Printing
-              </p>
-              <p className={clsx("text-3xl font-bold text-blue-600", isDark ? "text-blue-400" : "text-blue-600")}>
-                {stats.printing}
-              </p>
-            </div>
-            <Zap className={isDark ? "text-blue-400" : "text-blue-600"} size={32} />
-          </div>
-        </motion.div>
-
-        {/* Completed */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.25 }}
-          whileHover={{ scale: 1.05 }}
-          className={clsx(
-            "rounded-lg p-6 border",
-            isDark
-              ? "bg-slate-800 border-slate-700"
-              : "bg-white border-slate-200"
-          )}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className={clsx("text-sm font-medium opacity-75", isDark ? "text-slate-400" : "text-slate-600")}>
-                Completed
-              </p>
-              <p className={clsx("text-3xl font-bold text-green-600", isDark ? "text-green-400" : "text-green-600")}>
-                {stats.completed}
-              </p>
-            </div>
-            <CheckCircle className={isDark ? "text-green-400" : "text-green-600"} size={32} />
-          </div>
-        </motion.div>
-
-        {/* Failed */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.3 }}
-          whileHover={{ scale: 1.05 }}
-          className={clsx(
-            "rounded-lg p-6 border",
-            isDark
-              ? "bg-slate-800 border-slate-700"
-              : "bg-white border-slate-200"
-          )}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className={clsx("text-sm font-medium opacity-75", isDark ? "text-slate-400" : "text-slate-600")}>
-                Failed
-              </p>
-              <p className={clsx("text-3xl font-bold text-red-600", isDark ? "text-red-400" : "text-red-600")}>
-                {stats.failed || 0}
-              </p>
-            </div>
-            <AlertCircle className={isDark ? "text-red-400" : "text-red-600"} size={32} />
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Filter Buttons */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.3 }}
-        className={clsx(
-          "rounded-lg p-6 border flex gap-2 flex-wrap",
-          isDark
-            ? "bg-slate-800 border-slate-700"
-            : "bg-white border-slate-200"
-        )}>
-        {["all", "pending", "printing", "completed", "failed"].map(status => (
-          <motion.button
-            key={status}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setFilter(status)}
-            className={clsx(
-              "px-4 py-2 rounded-lg font-semibold transition-all capitalize",
-              filter === status
-                ? isDark
-                  ? "bg-cyan-600 text-white"
-                  : "bg-cyan-500 text-white"
-                : isDark
-                ? "bg-slate-700 text-slate-300 hover:bg-slate-600"
-                : "bg-slate-200 text-slate-700 hover:bg-slate-300"
-            )}
-          >
-            {status}
-          </motion.button>
-        ))}
-      </motion.div>
-
-      {/* Jobs Table */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.35 }}
-        className={clsx(
-          "rounded-lg overflow-hidden border",
-          isDark
-            ? "bg-slate-800 border-slate-700"
-            : "bg-white border-slate-200"
-        )}>
-        <table className="w-full">
-          <thead className={clsx(
-            isDark ? "bg-slate-700" : "bg-slate-100"
-          )}>
-            <tr>
-              <th className={clsx("px-6 py-3 text-left font-semibold", isDark ? "text-slate-200" : "text-slate-900")}>
-                Student
-              </th>
-              <th className={clsx("px-6 py-3 text-left font-semibold", isDark ? "text-slate-200" : "text-slate-900")}>
-                File Name
-              </th>
-              <th className={clsx("px-6 py-3 text-left font-semibold", isDark ? "text-slate-200" : "text-slate-900")}>
-                Copies
-              </th>
-              <th className={clsx("px-6 py-3 text-left font-semibold", isDark ? "text-slate-200" : "text-slate-900")}>
-                Color
-              </th>
-              <th className={clsx("px-6 py-3 text-left font-semibold", isDark ? "text-slate-200" : "text-slate-900")}>
-                Priority
-              </th>
-              <th className={clsx("px-6 py-3 text-left font-semibold", isDark ? "text-slate-200" : "text-slate-900")}>
-                Status
-              </th>
-              <th className={clsx("px-6 py-3 text-left font-semibold", isDark ? "text-slate-200" : "text-slate-900")}>
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className={clsx("divide-y", isDark ? "divide-slate-700" : "divide-slate-200")}>
-            {filteredJobs && filteredJobs.length > 0 ? (
-              filteredJobs.map((job, idx) => (
-              <motion.tr
-                key={job._id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: idx * 0.05 }}
-                whileHover={{ backgroundColor: isDark ? "rgb(55, 65, 81)" : "rgb(248, 250, 252)" }}
-                className={clsx(
-                  isDark ? "hover:bg-slate-700" : "hover:bg-slate-50",
-                  job.priority === "high"
-                    ? isDark
-                      ? "bg-red-900/20"
-                      : "bg-red-100/50"
-                    : ""
-                )}>
-                <td className={clsx("px-6 py-4 font-medium", isDark ? "text-white" : "text-slate-900")}>
-                  {job.userId?.name || "Unknown"}
-                </td>
-                <td className={clsx("px-6 py-4", isDark ? "text-slate-300" : "text-slate-600")}>
-                  {job.fileName}
-                </td>
-                <td className={clsx("px-6 py-4", isDark ? "text-slate-300" : "text-slate-600")}>
-                  {job.copies}
-                </td>
-                <td className="px-6 py-4">
-                  <span className={clsx(
-                    "px-3 py-1 rounded-full text-sm font-semibold",
-                    job.color
-                      ? isDark
-                        ? "bg-red-900 text-red-200"
-                        : "bg-red-100 text-red-900"
-                      : isDark
-                      ? "bg-gray-900 text-gray-200"
-                      : "bg-gray-100 text-gray-900"
-                  )}>
-                    {job.color ? "Color" : "B&W"}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <span className={clsx(
-                    "px-3 py-1 rounded-full text-sm font-semibold capitalize flex items-center gap-1 w-fit",
-                    job.priority === "high"
-                      ? isDark
-                        ? "bg-red-900 text-red-200"
-                        : "bg-red-100 text-red-900"
-                      : job.priority === "low"
-                      ? isDark
-                        ? "bg-slate-700 text-slate-300"
-                        : "bg-slate-200 text-slate-700"
-                      : isDark
-                      ? "bg-blue-900 text-blue-200"
-                      : "bg-blue-100 text-blue-900"
-                  )}>
-                    {job.priority === "high" ? <AlertCircle size={14} /> : null}
-                    {job.priority || "normal"}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <span className={clsx(
-                    "px-3 py-1 rounded-full text-sm font-semibold capitalize",
-                    normalize(job.status) === "pending"
-                      ? isDark
-                        ? "bg-yellow-900 text-yellow-200"
-                        : "bg-yellow-100 text-yellow-900"
-                      : normalize(job.status) === "printing"
-                      ? isDark
-                        ? "bg-blue-900 text-blue-200"
-                        : "bg-blue-100 text-blue-900"
-                      : normalize(job.status) === "completed"
-                      ? isDark
-                        ? "bg-green-900 text-green-200"
-                        : "bg-green-100 text-green-900"
-                      : isDark
-                      ? "bg-red-900 text-red-200"
-                      : "bg-red-100 text-red-900"
-                  )}>
-                    {job.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 space-x-2">
-                  {normalize(job.status) === "pending" && (
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => updateStatus(job._id, "printing")}
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {filteredJobs.map((job) => (
+              <div key={job._id} className={clsx("aspect-square rounded-xl border p-4", isDark ? "bg-slate-800 border-slate-700" : "bg-white border-slate-200")}>
+                <div className="h-full flex flex-col">
+                  <div className="flex items-start justify-between gap-2 mb-3">
+                    <span
                       className={clsx(
-                        "px-3 py-1 rounded-lg text-sm font-semibold transition-all",
-                        isDark
-                          ? "bg-blue-600 hover:bg-blue-700 text-white"
-                          : "bg-blue-500 hover:bg-blue-600 text-white"
+                        "px-2.5 py-1 rounded-full text-xs font-semibold capitalize",
+                        normalize(job.status) === "pending"
+                          ? "bg-amber-100 text-amber-900"
+                          : normalize(job.status) === "printing"
+                          ? "bg-blue-100 text-blue-900"
+                          : normalize(job.status) === "completed"
+                          ? "bg-emerald-100 text-emerald-900"
+                          : "bg-red-100 text-red-900"
                       )}
                     >
-                      Start
-                    </motion.button>
-                  )}
-
-                  {normalize(job.status) === "printing" && (
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => updateStatus(job._id, "completed")}
-                      className={clsx(
-                        "px-3 py-1 rounded-lg text-sm font-semibold transition-all",
-                        isDark
-                          ? "bg-green-600 hover:bg-green-700 text-white"
-                          : "bg-green-500 hover:bg-green-600 text-white"
-                      )}
-                    >
-                      Complete
-                    </motion.button>
-                  )}
-
-                  {normalize(job.status) === "completed" && (
-                    <span className={clsx(
-                      "px-3 py-1 rounded-lg text-sm font-semibold inline-block",
-                      isDark
-                        ? "bg-slate-700 text-slate-300"
-                        : "bg-slate-200 text-slate-600"
-                    )}>
-                      Done
+                      {job.status}
                     </span>
-                  )}
-
-                  {normalize(job.status) !== "completed" && normalize(job.status) !== "failed" && (
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => updateStatus(job._id, "failed")}
-                      className={clsx(
-                        "px-3 py-1 rounded-lg text-sm font-semibold transition-all",
-                        isDark
-                          ? "bg-red-600 hover:bg-red-700 text-white"
-                          : "bg-red-500 hover:bg-red-600 text-white"
-                      )}
-                    >
-                      Fail
-                    </motion.button>
-                  )}
-
-                  {normalize(job.status) === "failed" && (
-                    <span className={clsx(
-                      "px-3 py-1 rounded-lg text-sm font-semibold inline-block",
-                      isDark
-                        ? "bg-red-900 text-red-200"
-                        : "bg-red-100 text-red-900"
-                    )}>
-                      Failed
+                    <span className={clsx("text-xs", isDark ? "text-slate-400" : "text-slate-500")}>
+                      {new Date(job.createdAt).toLocaleDateString()}
                     </span>
-                  )}
-                </td>
-              </motion.tr>
-            ))
-            ) : (
-              <tr>
-                <td colSpan="7" className={clsx(
-                  "px-6 py-12 text-center",
-                  isDark ? "bg-slate-700 text-slate-300" : "bg-slate-50 text-slate-600"
-                )}>
-                  No {filter !== "all" ? filter : ""} jobs found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </motion.div>
+                  </div>
+
+                  <p className={clsx("text-sm font-semibold line-clamp-2", isDark ? "text-white" : "text-slate-900")}>{job.fileName}</p>
+                  <p className={clsx("text-xs mt-1", isDark ? "text-slate-400" : "text-slate-600")}>{job.userId?.name || "Unknown"}</p>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs mt-3">
+                    <div>
+                      <p className={isDark ? "text-slate-500" : "text-slate-500"}>Copies</p>
+                      <p className={clsx("font-medium", isDark ? "text-slate-200" : "text-slate-800")}>{job.copies}</p>
+                    </div>
+                    <div>
+                      <p className={isDark ? "text-slate-500" : "text-slate-500"}>Paper</p>
+                      <p className={clsx("font-medium", isDark ? "text-slate-200" : "text-slate-800")}>{job.pageSize}</p>
+                    </div>
+                  </div>
+
+                  <div className="mt-auto pt-3 border-t border-slate-200/40 flex flex-wrap gap-2">
+                    {normalize(job.status) === "pending" && (
+                      <button onClick={() => updateStatus(job._id, "printing")} className="px-3 py-1.5 text-xs rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">Start</button>
+                    )}
+                    {normalize(job.status) === "printing" && (
+                      <button onClick={() => updateStatus(job._id, "completed")} className="px-3 py-1.5 text-xs rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition">Complete</button>
+                    )}
+                    {normalize(job.status) !== "completed" && normalize(job.status) !== "failed" && (
+                      <button onClick={() => updateStatus(job._id, "failed")} className="px-3 py-1.5 text-xs rounded-lg bg-red-600 text-white hover:bg-red-700 transition">Fail</button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </PageWrapper>
   );
