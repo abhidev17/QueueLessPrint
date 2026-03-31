@@ -15,6 +15,8 @@ import AdminReportsPage from "./pages/AdminReportsPage";
 import StaffDashboard from "./pages/StaffDashboard";
 import StaffJobs from "./pages/StaffJobs";
 import StaffSettings from "./pages/StaffSettings";
+import { StudentLayout } from "./components/StudentLayout";
+import StudentSettings from "./pages/StudentSettings";
 import ErrorBoundary from "./components/ErrorBoundary";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -87,6 +89,21 @@ function AppContent() {
           </ProtectedRoute>
         }
       />
+
+      {/* Student Routes - Nested */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute allowedRoles={["student"]}>
+            <StudentLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Dashboard user={user} />} />
+        <Route path="submit" element={<StudentPageNew user={user} />} />
+        <Route path="jobs" element={<StudentJobsNew user={user} />} />
+        <Route path="settings" element={<StudentSettings />} />
+      </Route>
 
       {/* Admin Routes - Nested */}
       <Route
