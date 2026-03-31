@@ -51,11 +51,12 @@ export default function StaffDashboard({ user }) {
     try {
       setLoading(true);
       const res = await API.get("/print/all");
-      setJobs(res.data || []);
+      setJobs(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       const errorMsg = err.response?.data?.message || "Failed to load jobs";
       toast.error(errorMsg);
       console.error("Load jobs error:", err);
+      setJobs([]);
     } finally {
       setLoading(false);
     }

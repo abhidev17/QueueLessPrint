@@ -68,31 +68,9 @@ function AppContent() {
         }
       />
 
-      <Route
-        path="/submit-job"
-        element={
-          <ProtectedRoute allowedRoles={["student"]}>
-            <AppLayout currentPage="Submit Job">
-              <StudentPageNew user={user} />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/my-jobs"
-        element={
-          <ProtectedRoute allowedRoles={["student"]}>
-            <AppLayout currentPage="My Jobs">
-              <StudentJobsNew user={user} />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-
       {/* Student Routes - Nested */}
       <Route
-        path="/dashboard"
+        path="/dashboard"  
         element={
           <ProtectedRoute allowedRoles={["student"]}>
             <StudentLayout />
@@ -124,7 +102,7 @@ function AppContent() {
       <Route
         path="/staff"
         element={
-          <ProtectedRoute allowedRoles={["staff", "admin", "superadmin"]}>
+          <ProtectedRoute allowedRoles={["staff"]}>
             <StaffLayout user={user} />
           </ProtectedRoute>
         }
