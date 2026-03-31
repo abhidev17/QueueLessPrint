@@ -110,7 +110,7 @@ export default function AdminUsersPage({ user }) {
               ? "bg-slate-800 border-slate-700"
           : "bg-white border-slate-200"
       )}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <p className={clsx("text-sm font-medium opacity-75", isDark ? "text-slate-400" : "text-slate-600")}>
               Total Users
@@ -133,6 +133,14 @@ export default function AdminUsersPage({ user }) {
             </p>
             <p className={clsx("text-3xl font-bold text-green-600", isDark ? "text-green-400" : "text-green-600")}>
               {users.filter(u => u.role === "student").length}
+            </p>
+          </div>
+          <div>
+            <p className={clsx("text-sm font-medium opacity-75", isDark ? "text-slate-400" : "text-slate-600")}>
+              Staff Accounts
+            </p>
+            <p className={clsx("text-3xl font-bold text-orange-600", isDark ? "text-orange-400" : "text-orange-600")}>
+              {users.filter(u => u.role === "staff").length}
             </p>
           </div>
         </div>
