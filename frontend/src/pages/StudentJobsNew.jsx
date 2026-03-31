@@ -8,6 +8,9 @@ function StudentJobsNew({ user }) {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Status normalization
+  const normalize = (s) => s?.toLowerCase() || "";
+
   useEffect(() => {
     loadJobs();
 
@@ -68,7 +71,8 @@ function StudentJobsNew({ user }) {
   };
 
   const getStatusColor = (status) => {
-    switch (status) {
+    const normalized = normalize(status);
+    switch (normalized) {
       case "completed":
         return "bg-emerald-100 text-emerald-800";
       case "printing":
@@ -83,7 +87,8 @@ function StudentJobsNew({ user }) {
   };
 
   const getStatusIcon = (status) => {
-    switch (status) {
+    const normalized = normalize(status);
+    switch (normalized) {
       case "completed":
         return <CheckCircle size={20} />;
       case "printing":
@@ -135,10 +140,10 @@ function StudentJobsNew({ user }) {
                 <h3 className="text-sm font-bold text-slate-900 mb-3">📊 Summary</h3>
                 <div className="grid grid-cols-2 gap-2">
                   {(() => {
-                    const pending = jobs.filter(j => j.status === "pending").length;
-                    const printing = jobs.filter(j => j.status === "printing").length;
-                    const completed = jobs.filter(j => j.status === "completed").length;
-                    const failed = jobs.filter(j => j.status === "failed").length;
+                    const pending = jobs.filter(j => normalize(j.status) === "pending").length;
+                    const printing = jobs.filter(j => normalize(j.status) === "printing").length;
+                    const completed = jobs.filter(j => normalize(j.status) === "completed").length;
+                    const failed = jobs.filter(j => normalize(j.status) === "failed").length;
                     const total = jobs.length;
                     const completedPercent = total > 0 ? ((completed / total) * 100).toFixed(0) : 0;
 

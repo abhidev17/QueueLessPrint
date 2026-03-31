@@ -14,6 +14,9 @@ export default function StaffDashboard({ user }) {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
 
+  // Status normalization
+  const normalize = (s) => s?.toLowerCase() || "";
+
   useEffect(() => {
     loadJobs();
 
@@ -82,14 +85,15 @@ export default function StaffDashboard({ user }) {
   const prioritySortedJobs = sortByPriority(jobs);
   
   const filteredJobs = prioritySortedJobs.filter(job =>
-    filter === "all" ? true : job.status === filter
+    filter === "all" ? true : normalize(job.status) === filter
   );
 
   const stats = {
     total: jobs.length,
-    pending: jobs.filter(j => j.status === "pending").length,
-    printing: jobs.filter(j => j.status === "printing").length,
-    completed: jobs.filter(j => j.status === "completed").length
+    pending: jobs.filter(j => normalize(j.status) === "pending").length,
+    printing: jobs.filter(j => normalize(j.status) === "printing").length,
+    completed: jobs.filter(j => normalize(j.status) === "completed").length,
+    failed: jobs.filter(j => normalize(j.status) === "failed").length
   };
 
   if (loading) {
@@ -225,7 +229,28 @@ export default function StaffDashboard({ user }) {
                 {stats.completed}
               </p>
             </div>
-            <CheckCircle className={isDark ? "text-green-400" : "text-green-600"} size={32} />
+        {/* Failed */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+          whileHover={{ scale: 1.05 }}
+          className={clsx(
+            "rounded-lg p-6 border",
+            isDark
+              ? "bg-slate-800 border-slate-700"
+              : "bg-white border-slate-200"
+          )}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className={clsx("text-sm font-medium opacity-75", isDark ? "text-slate-400" : "text-slate-600")}>
+                Failed
+              </p>
+              <p className={clsx("text-3xl font-bold text-red-600", isDark ? "text-red-400" : "text-red-600")}>
+                {stats.failed || 0}
+              </p>
+            </div>
+            <AlertCircle className={isDark ? "text-red-400" : "text-red-600"} size={32} />
           </div>
         </motion.div>
       </div>
@@ -241,7 +266,7 @@ export default function StaffDashboard({ user }) {
             ? "bg-slate-800 border-slate-700"
             : "bg-white border-slate-200"
         )}>
-        {["all", "pending", "printing", "completed"].map(status => (
+        {["all", "pending", "printing", "completed", "failed"].map(status => (
           <motion.button
             key={status}
             whileHover={{ scale: 1.05 }}
@@ -363,23 +388,27 @@ export default function StaffDashboard({ user }) {
                 <td className="px-6 py-4">
                   <span className={clsx(
                     "px-3 py-1 rounded-full text-sm font-semibold capitalize",
-                    job.status === "pending"
+                    normalize(job.status) === "pending"
                       ? isDark
                         ? "bg-yellow-900 text-yellow-200"
                         : "bg-yellow-100 text-yellow-900"
-                      : job.status === "printing"
+                      : normalize(job.status) === "printing"
                       ? isDark
                         ? "bg-blue-900 text-blue-200"
                         : "bg-blue-100 text-blue-900"
+                      : normalize(job.status) === "completed"
+                      ? isDark
+                        ? "bg-green-900 text-green-200"
+                        : "bg-green-100 text-green-900"
                       : isDark
-                      ? "bg-green-900 text-green-200"
-                      : "bg-green-100 text-green-900"
+                      ? "bg-red-900 text-red-200"
+                      : "bg-red-100 text-red-900"
                   )}>
                     {job.status}
                   </span>
                 </td>
                 <td className="px-6 py-4 space-x-2">
-                  {job.status === "pending" && (
+                  {normalize(job.status) === "pending" && (
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -395,7 +424,7 @@ export default function StaffDashboard({ user }) {
                     </motion.button>
                   )}
 
-                  {job.status === "printing" && (
+                  {normalize(job.status) === "printing" && (
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -411,7 +440,7 @@ export default function StaffDashboard({ user }) {
                     </motion.button>
                   )}
 
-                  {job.status === "completed" && (
+                  {normalize(job.status) === "completed" && (
                     <span className={clsx(
                       "px-3 py-1 rounded-lg text-sm font-semibold inline-block",
                       isDark
@@ -419,6 +448,33 @@ export default function StaffDashboard({ user }) {
                         : "bg-slate-200 text-slate-600"
                     )}>
                       Done
+                    </span>
+                  )}
+
+                  {normalize(job.status) !== "completed" && normalize(job.status) !== "failed" && (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => updateStatus(job._id, "failed")}
+                      className={clsx(
+                        "px-3 py-1 rounded-lg text-sm font-semibold transition-all",
+                        isDark
+                          ? "bg-red-600 hover:bg-red-700 text-white"
+                          : "bg-red-500 hover:bg-red-600 text-white"
+                      )}
+                    >
+                      Fail
+                    </motion.button>
+                  )}
+
+                  {normalize(job.status) === "failed" && (
+                    <span className={clsx(
+                      "px-3 py-1 rounded-lg text-sm font-semibold inline-block",
+                      isDark
+                        ? "bg-red-900 text-red-200"
+                        : "bg-red-100 text-red-900"
+                    )}>
+                      Failed
                     </span>
                   )}
                 </td>

@@ -30,6 +30,7 @@ function Dashboard({ user }) {
     pending: 0,
     printing: 0,
     completed: 0,
+    failed: 0,
   });
   const [chartData, setChartData] = useState([]);
   const [recentJobs, setRecentJobs] = useState([]);
@@ -37,6 +38,9 @@ function Dashboard({ user }) {
 
   const { isDark } = useTheme();
   const isAdmin = user?.role === "admin";
+
+  // Status normalization
+  const normalize = (s) => s?.toLowerCase() || "";
 
   useEffect(() => {
     loadDashboardData();
@@ -71,10 +75,10 @@ function Dashboard({ user }) {
   const calculateStats = (jobsList) => {
     const newStats = {
       total: jobsList.length,
-      pending: jobsList.filter((j) => j?.status === "pending").length,
-      printing: jobsList.filter((j) => j?.status === "printing").length,
-      completed: jobsList.filter((j) => j?.status === "completed").length,
-      failed: jobsList.filter((j) => j?.status === "failed").length,
+      pending: jobsList.filter((j) => normalize(j?.status) === "pending").length,
+      printing: jobsList.filter((j) => normalize(j?.status) === "printing").length,
+      completed: jobsList.filter((j) => normalize(j?.status) === "completed").length,
+      failed: jobsList.filter((j) => normalize(j?.status) === "failed").length,
     };
     setStats(newStats);
   };
@@ -87,10 +91,11 @@ function Dashboard({ user }) {
         day: "numeric",
       });
       if (!grouped[date]) grouped[date] = { date, pending: 0, printing: 0, completed: 0, failed: 0 };
-      if (job.status === "pending") grouped[date].pending++;
-      if (job.status === "printing") grouped[date].printing++;
-      if (job.status === "completed") grouped[date].completed++;
-      if (job.status === "failed") grouped[date].failed++;
+      const status = normalize(job.status);
+      if (status === "pending") grouped[date].pending++;
+      if (status === "printing") grouped[date].printing++;
+      if (status === "completed") grouped[date].completed++;
+      if (status === "failed") grouped[date].failed++;
     });
 
     setChartData(Object.values(grouped).slice(-7));
@@ -111,7 +116,8 @@ function Dashboard({ user }) {
   };
 
   const getStatusColor = (status) => {
-    switch (status) {
+    const normalized = normalize(status);
+    switch (normalized) {
       case "completed":
         return "success";
       case "printing":

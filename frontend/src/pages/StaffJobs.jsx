@@ -11,6 +11,9 @@ export default function StaffJobs() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
 
+  // Status normalization
+  const normalize = (s) => s?.toLowerCase() || "";
+
   useEffect(() => {
     loadJobs();
   }, []);
@@ -42,7 +45,8 @@ export default function StaffJobs() {
   };
 
   const getStatusIcon = (status) => {
-    switch (status) {
+    const normalized = normalize(status);
+    switch (normalized) {
       case "completed":
         return <CheckCircle className="text-green-500" size={20} />;
       case "printing":
@@ -56,7 +60,7 @@ export default function StaffJobs() {
 
   const filteredJobs = jobs.filter((job) => {
     if (filter === "all") return true;
-    return job.status === filter;
+    return normalize(job.status) === filter;
   });
 
   return (
@@ -160,7 +164,7 @@ export default function StaffJobs() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex gap-2">
-                        {job.status === "pending" && (
+                        {normalize(job.status) === "pending" && (
                           <button
                             onClick={() => updateJobStatus(job._id, "printing")}
                             className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition"
@@ -168,7 +172,7 @@ export default function StaffJobs() {
                             Start
                           </button>
                         )}
-                        {job.status === "printing" && (
+                        {normalize(job.status) === "printing" && (
                           <button
                             onClick={() => updateJobStatus(job._id, "completed")}
                             className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition"
@@ -176,7 +180,7 @@ export default function StaffJobs() {
                             Complete
                           </button>
                         )}
-                        {job.status !== "completed" && (
+                        {normalize(job.status) !== "completed" && normalize(job.status) !== "failed" && (
                           <button
                             onClick={() => updateJobStatus(job._id, "failed")}
                             className="px-2 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition"
