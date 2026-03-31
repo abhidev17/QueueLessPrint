@@ -512,6 +512,7 @@ export default function StaffDashboard({ user }) {
                 </td>
               </tr>
             )}
+          </tbody>
         </table>
       </motion.div>
       </div>

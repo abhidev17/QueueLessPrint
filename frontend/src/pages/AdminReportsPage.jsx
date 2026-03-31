@@ -140,8 +140,7 @@ export default function AdminReportsPage() {
             <div className={clsx("flex items-center justify-center h-64", isDark ? "text-slate-400" : "text-slate-500")}>
               <p>No job status data available</p>
             </div>
-          )}
-
+          )}        </div>
         {/* Performance Metrics */}
         <div className={clsx(
           "rounded-lg p-6 border",
