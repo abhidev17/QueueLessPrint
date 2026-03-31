@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { AppLayout } from "./components/common/AppLayout";
+import { AdminLayout } from "./components/AdminLayout";
 import AuthPage from "./pages/AuthPage";
 import Dashboard from "./pages/Dashboard";
 import StudentPageNew from "./pages/StudentPageNew";
@@ -84,50 +85,20 @@ function AppContent() {
         }
       />
 
-      {/* Admin Routes */}
+      {/* Admin Routes - Nested */}
       <Route
         path="/admin"
         element={
           <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
-            <AppLayout currentPage="Dashboard">
-              <AdminPageNew user={user} />
-            </AppLayout>
+            <AdminLayout user={user} />
           </ProtectedRoute>
         }
-      />
-
-      <Route
-        path="/admin/users"
-        element={
-          <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
-            <AppLayout currentPage="Users">
-              <AdminUsersPage user={user} />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/admin/print-jobs"
-        element={
-          <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
-            <AppLayout currentPage="Print Jobs">
-              <AdminPrintJobsPage user={user} />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/admin/reports"
-        element={
-          <ProtectedRoute allowedRoles={["admin", "superadmin"]}>
-            <AppLayout currentPage="Reports">
-              <AdminReportsPage user={user} />
-            </AppLayout>
-          </ProtectedRoute>
-        }
-      />
+      >
+        <Route index element={<AdminPageNew user={user} />} />
+        <Route path="users" element={<AdminUsersPage user={user} />} />
+        <Route path="print-jobs" element={<AdminPrintJobsPage user={user} />} />
+        <Route path="reports" element={<AdminReportsPage user={user} />} />
+      </Route>
 
       {/* Staff Routes */}
       <Route
