@@ -2,6 +2,15 @@ import React from "react";
 import { useTheme } from "../../context/ThemeContext";
 import clsx from "clsx";
 
+// Import all new component modules
+export { StatusBadge } from "./StatusBadge";
+export { JobCard } from "./JobCard";
+export { ConfirmModal } from "./ConfirmModal";
+export { LoadingSpinner, CardSkeleton } from "./LoadingSpinner";
+export { EmptyState } from "./EmptyState";
+export { JobTable } from "./JobTable";
+export { FilterBar } from "./FilterBar";
+
 /**
  * Professional Button Component
  * @param {string} variant - primary | secondary | danger | ghost
