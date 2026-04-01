@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import clsx from "clsx";
 
-export default function StaffSidebar() {
+export default function StaffSidebar({ onNavigate }) {
   const { logout } = useAuth();
   const { isDark } = useTheme();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -72,6 +72,7 @@ export default function StaffSidebar() {
               key={item.label}
               to={item.to}
               end={item.to === "/staff"}
+              onClick={() => onNavigate?.()}
               className={({ isActive }) =>
                 clsx(
                   "group flex items-center gap-4 px-4.5 py-4 rounded-xl transition-all duration-200",

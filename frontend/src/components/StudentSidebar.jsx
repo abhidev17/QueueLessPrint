@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import clsx from "clsx";
 
-export default function StudentSidebar() {
+export default function StudentSidebar({ onNavigate }) {
   const { logout } = useAuth();
   const { isDark } = useTheme();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -65,6 +65,7 @@ export default function StudentSidebar() {
               key={item.label}
               to={item.to}
               end={item.to === "/dashboard"}
+              onClick={() => onNavigate?.()}
               className={({ isActive }) =>
                 clsx(
                   "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",

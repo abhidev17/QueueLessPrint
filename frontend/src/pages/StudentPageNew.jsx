@@ -134,28 +134,28 @@ function StudentPageNew({ user }) {
   return (
     <>
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 pb-32">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 pb-16 sm:pb-24">
         {/* Floating Header */}
-        <div className="sticky top-0 z-50 backdrop-blur-xl bg-slate-950/40 border-b border-white/10 shadow-lg transition-all duration-300">
-          <div className="max-w-2xl mx-auto px-6 py-6">
+        <div className="sticky top-16 lg:top-0 z-30 backdrop-blur-xl bg-slate-950/60 border-b border-white/10 shadow-lg transition-all duration-300">
+          <div className="max-w-2xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl">
-                <Upload className="text-white" size={24} />
+                <Upload className="text-white" size={20} />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-                  Submit Print Job <Sparkles size={20} className="text-yellow-400" />
+                <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                  Submit Print Job <Sparkles size={18} className="text-yellow-400" />
                 </h1>
-                <p className="text-slate-400 text-sm">Upload and schedule your document</p>
+                <p className="text-slate-400 text-xs sm:text-sm">Upload and schedule your document</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Main Content */}
-        <div className="max-w-2xl mx-auto px-6 py-8 space-y-6">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-5 sm:space-y-6">
           {/* Main Form Card - Glass Effect */}
-          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl hover:bg-white/[0.07] transition-all duration-300">
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl sm:rounded-3xl p-5 sm:p-8 shadow-2xl hover:bg-white/[0.07] transition-all duration-300">
             <form onSubmit={submitPrint} className="space-y-6">
               {/* File Upload - Modern Design */}
               <div>
@@ -165,7 +165,7 @@ function StudentPageNew({ user }) {
                 </label>
                 <div className="group relative">
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl opacity-0 group-hover:opacity-20 blur transition duration-300"></div>
-                  <div className="relative border-2 border-dashed border-blue-400/50 group-hover:border-blue-400 rounded-2xl p-8 text-center bg-gradient-to-br from-blue-500/5 to-indigo-600/5 hover:from-blue-500/10 hover:to-indigo-600/10 transition-all duration-300 cursor-pointer">
+                  <div className="relative border-2 border-dashed border-blue-400/50 group-hover:border-blue-400 rounded-2xl p-5 sm:p-8 text-center bg-gradient-to-br from-blue-500/5 to-indigo-600/5 hover:from-blue-500/10 hover:to-indigo-600/10 transition-all duration-300 cursor-pointer">
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -175,7 +175,7 @@ function StudentPageNew({ user }) {
                       accept=".pdf,.doc,.docx,.txt,.jpg,.png"
                     />
                     <label htmlFor="file-input" className="cursor-pointer block">
-                      <Upload className="mx-auto mb-3 text-blue-400 group-hover:text-blue-300 transition" size={40} />
+                      <Upload className="mx-auto mb-3 text-blue-400 group-hover:text-blue-300 transition" size={34} />
                       <p className="text-white font-semibold">
                         {file ? (
                           <span className="text-green-400 flex items-center justify-center gap-2">
@@ -228,7 +228,7 @@ function StudentPageNew({ user }) {
               )}
 
               {/* Settings Grid */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Date Selection */}
                 <div>
                   <label className="block text-sm font-semibold text-white mb-2 flex items-center gap-2">
@@ -328,7 +328,7 @@ function StudentPageNew({ user }) {
               <button
                 type="submit"
                 disabled={loading || !file}
-                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 shadow-lg hover:shadow-blue-500/50 active:scale-95"
+                className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-blue-500/50 active:scale-95"
               >
                 {loading ? (
                   <>
@@ -347,7 +347,7 @@ function StudentPageNew({ user }) {
 
           {/* Time Slots Card - Glass Effect */}
           {safeSlots.length > 0 && (
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-6 shadow-2xl">
+            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-2xl">
               <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                 <Calendar size={20} className="text-blue-400" />
                 Available Time Slots

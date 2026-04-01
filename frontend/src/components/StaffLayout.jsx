@@ -30,7 +30,7 @@ export function StaffLayout() {
         <>
           <div className="lg:hidden fixed inset-0 z-40 bg-black/50" onClick={() => setMobileMenuOpen(false)} />
           <div className="lg:hidden fixed left-0 top-0 z-50 h-screen w-72 overflow-y-auto">
-            <StaffSidebar />
+            <StaffSidebar onNavigate={() => setMobileMenuOpen(false)} />
           </div>
         </>
       )}
