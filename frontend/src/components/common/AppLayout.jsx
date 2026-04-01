@@ -8,7 +8,9 @@ import { useTheme } from "../../context/ThemeContext";
 import clsx from "clsx";
 
 export function AppLayout({ children, currentPage }) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth >= 768 : true
+  );
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
@@ -41,6 +43,54 @@ export function AppLayout({ children, currentPage }) {
     setShowLogoutConfirm(false);
     navigate("/auth");
   };
+
+  const handleNavigate = (path) => {
+    navigate(path);
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
+  };
+
+  const sidebarContent = (
+    <>
+      <nav className="space-y-2">
+        {menuItems.map(({ label, icon: Icon, href }) => (
+          <motion.button
+            key={href}
+            onClick={() => handleNavigate(href)}
+            whileHover={{ x: 4 }}
+            className={clsx(
+              "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left",
+              currentPage === label
+                ? "bg-blue-600 text-white"
+                : isDark
+                ? "text-slate-300 hover:bg-slate-700"
+                : "text-slate-700 hover:bg-slate-100"
+            )}
+          >
+            <Icon size={20} />
+            {label}
+          </motion.button>
+        ))}
+      </nav>
+
+      <motion.button
+        whileHover={{ x: 4 }}
+        className={clsx(
+          "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors mt-8 text-left",
+          currentPage === "Settings"
+            ? "bg-blue-600 text-white"
+            : isDark
+            ? "text-slate-300 hover:bg-slate-700"
+            : "text-slate-700 hover:bg-slate-100"
+        )}
+        onClick={() => handleNavigate(settingsPath)}
+      >
+        <Settings size={20} />
+        Settings
+      </motion.button>
+    </>
+  );
 
   return (
     <div className={clsx("min-h-screen", isDark ? "bg-slate-900" : "bg-slate-50")}>
@@ -117,7 +167,7 @@ export function AppLayout({ children, currentPage }) {
       </nav>
 
       <div className="flex">
-        {/* Sidebar */}
+        {/* Desktop Sidebar */}
         <AnimatePresence>
           {sidebarOpen && (
             <motion.aside
@@ -126,48 +176,39 @@ export function AppLayout({ children, currentPage }) {
               exit={{ x: -250, opacity: 0 }}
               transition={{ duration: 0.2 }}
               className={clsx(
-                "w-64 border-r min-h-screen p-6 hidden sm:block",
+                "hidden md:block w-64 border-r min-h-screen p-6",
                 isDark ? "border-slate-700 bg-slate-800" : "border-slate-200 bg-white"
               )}
             >
-              <nav className="space-y-2">
-                {menuItems.map(({ label, icon: Icon, href }) => (
-                  <motion.button
-                    key={href}
-                    onClick={() => navigate(href)}
-                    whileHover={{ x: 4 }}
-                    className={clsx(
-                      "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left",
-                      currentPage === label
-                        ? "bg-blue-600 text-white"
-                        : isDark
-                        ? "text-slate-300 hover:bg-slate-700"
-                        : "text-slate-700 hover:bg-slate-100"
-                    )}
-                  >
-                    <Icon size={20} />
-                    {label}
-                  </motion.button>
-                ))}
-              </nav>
-
-              {/* Settings */}
-              <motion.button
-                whileHover={{ x: 4 }}
-                className={clsx(
-                  "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors mt-8 text-left",
-                  currentPage === "Settings"
-                    ? "bg-blue-600 text-white"
-                    : isDark
-                    ? "text-slate-300 hover:bg-slate-700"
-                    : "text-slate-700 hover:bg-slate-100"
-                )}
-                onClick={() => navigate(settingsPath)}
-              >
-                <Settings size={20} />
-                Settings
-              </motion.button>
+              {sidebarContent}
             </motion.aside>
+          )}
+        </AnimatePresence>
+
+        {/* Mobile Sidebar Drawer */}
+        <AnimatePresence>
+          {sidebarOpen && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="md:hidden fixed inset-0 z-40 bg-black/50"
+                onClick={() => setSidebarOpen(false)}
+              />
+              <motion.aside
+                initial={{ x: -260 }}
+                animate={{ x: 0 }}
+                exit={{ x: -260 }}
+                transition={{ duration: 0.2 }}
+                className={clsx(
+                  "md:hidden fixed left-0 top-0 z-50 h-screen w-72 border-r p-6 overflow-y-auto",
+                  isDark ? "border-slate-700 bg-slate-900" : "border-slate-200 bg-white"
+                )}
+              >
+                {sidebarContent}
+              </motion.aside>
+            </>
           )}
         </AnimatePresence>
 
