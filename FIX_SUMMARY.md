@@ -85,7 +85,7 @@ if (userRole === "admin" || userRole === "superadmin") {
   redirectTo = "/staff";  // FIXED!
 } else {
   redirectTo = "/dashboard";
-}
+ }
 ```
 
 ✅ Added debug logging:
