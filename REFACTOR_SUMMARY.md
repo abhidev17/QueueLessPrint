@@ -145,7 +145,7 @@ useSocket(
   handleJobUpdated,      // Update job in list
   handleJobDeleted,      // Remove job from list
   handleJobsBulkDeleted  // Remove multiple jobs from list
-);
+ );
 ```
 
 **Used In All Dashboards**:
