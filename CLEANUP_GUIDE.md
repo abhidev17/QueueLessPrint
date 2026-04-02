@@ -60,7 +60,7 @@ const handleCleanupOrphans = async () => {
 
 **Example Response**:
 ```json
-{
+ { 
   "success": true,
   "message": "Cleaned up 12 orphaned jobs",
   "deletedCount": 12,
