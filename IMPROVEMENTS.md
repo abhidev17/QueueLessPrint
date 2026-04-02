@@ -268,7 +268,7 @@ frontend/
 
 2. **Frontend**
    - `tailwind.config.js` - Tailwind configuration
-   - `postcss.config.js` - PostCSS configuration
+   - `postcss.config.js` -  PostCSS configuration
 
 ---
 
