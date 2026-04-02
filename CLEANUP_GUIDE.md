@@ -65,7 +65,7 @@ const handleCleanupOrphans = async () => {
   "message": "Cleaned up 12 orphaned jobs",
   "deletedCount": 12,
   "deletedIds": ["id1", "id2", ..., "id12"]
-}
+   }
 ```
 
 ## Defense Layers Summary
